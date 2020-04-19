@@ -38,8 +38,7 @@ subprojects {
     }
 
     [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
-
-    // 打包源码
+// 打包源码
     task sourceJar(type: Jar, dependsOn: classes) {
         classifier 'sources'
         from sourceSets.main.allSource
@@ -61,24 +60,48 @@ subprojects {
                 name = "GitHubPackages"
                 url = uri("https://maven.pkg.github.com/xbeeant/xstudio")
                 credentials {
-                    username = project.findProperty("gpr.user") ?: System.getenv("USER")
-                    password = project.findProperty("gpr.key") ?: System.getenv("PWD")
+                    username = "huangxb0512@gmail.com"
+                    password = ""
                 }
             }
         }
         publications {
-            gpr(MavenPublication) {
-                from(components.java)
-            }
             mavenJava(MavenPublication) {
+                artifactId = 'com.xstudio'
+                from components.java
                 artifact sourceJar
                 artifact javadocJar
+                pom {
+                    description = "xstudio spring & java tool"
+                    url = "https://maven.pkg.github.com/xbeeant/xstudio"
+                    licenses {
+                        license {
+                            name = "MIT License"
+                            url = "https://mit-license.org/"
+                        }
+                    }
+                    developers {
+                        developer {
+                            id = "beeant0512"
+                            name = "Xiaobiao Huang"
+                            email = "huangxb0512@gmail.com"
+                        }
+                    }
+                    scm {
+                        connection = "https://maven.pkg.github.com/xbeeant/xstudio"
+                        developerConnection = "https://maven.pkg.github.com/xbeeant/xstudio"
+                        url = "https://maven.pkg.github.com/xbeeant/xstudio"
+                    }
+                }
             }
         }
     }
 
     javadoc {
-        options{
+        if(JavaVersion.current().isJava9Compatible()) {
+            options.addBooleanOption('html5', true)
+        }
+        options {
             encoding "UTF-8"
             charSet 'UTF-8'
             author true
