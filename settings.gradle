@@ -1,0 +1,12 @@
+rootProject.name = 'xstudio'
+include 'antdesign'
+include 'core'
+include 'serializer'
+include 'web'
+include 'mybatis'
+include 'mybatis-pagehelper'
+include 'redis'
+include 'api-gateway'
+include 'http'
+include 'aop'
+

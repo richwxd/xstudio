@@ -1,0 +1,11 @@
+group 'com.xstudio'
+version '1.0.0-SNAPSHOT'
+
+dependencies {
+    compile project(":core")
+
+    compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.9'
+    compile group: 'org.apache.httpcomponents', name: 'httpmime', version: '4.5.9'
+
+    compileOnly group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
+}

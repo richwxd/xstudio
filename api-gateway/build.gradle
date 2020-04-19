@@ -1,0 +1,12 @@
+group 'com.xstudio.spring'
+version '1.0.0-SNAPSHOT'
+
+dependencies {
+    compile project(":redis")
+    compile project(":web")
+    compile project(":http")
+    // https://mvnrepository.com/artifact/org.aspectj/aspectjrt
+    compile group: 'org.aspectj', name: 'aspectjrt', version: '1.9.5'
+
+    compileOnly group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
+}
