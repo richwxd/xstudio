@@ -38,7 +38,7 @@ subprojects {
     }
 
     [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
-// 打包源码
+    // 打包源码
     task sourceJar(type: Jar, dependsOn: classes) {
         classifier 'sources'
         from sourceSets.main.allSource
@@ -67,7 +67,6 @@ subprojects {
         }
         publications {
             mavenJava(MavenPublication) {
-                artifactId = 'com.xstudio'
                 from components.java
                 artifact sourceJar
                 artifact javadocJar
