@@ -32,8 +32,8 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.*;
 import javax.servlet.http.HttpServletRequest;
@@ -113,7 +113,7 @@ public class RequestUtil {
     /**
      * 日志
      */
-    private static Logger logger = LogManager.getLogger(RequestUtil.class);
+    private static Logger logger = LoggerFactory.getLogger(RequestUtil.class);
 
     /**
      * 获取HttpClient对象

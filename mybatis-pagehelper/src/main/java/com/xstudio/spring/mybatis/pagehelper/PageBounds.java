@@ -1,8 +1,6 @@
 package com.xstudio.spring.mybatis.pagehelper;
 
 import com.github.pagehelper.PageRowBounds;
-import lombok.Getter;
-import lombok.Setter;
 
 /**
  * 分页对象
@@ -11,17 +9,28 @@ import lombok.Setter;
  * @version 2020/2/3
  */
 public class PageBounds extends PageRowBounds {
-    @Getter
-    @Setter
+
     private String orders;
 
-    @Getter
-    @Setter
     private Integer page = 1;
 
     public PageBounds(int offset, int limit) {
         super(offset, limit);
     }
 
+    public String getOrders() {
+        return orders;
+    }
 
+    public void setOrders(String orders) {
+        this.orders = orders;
+    }
+
+    public Integer getPage() {
+        return page;
+    }
+
+    public void setPage(Integer page) {
+        this.page = page;
+    }
 }

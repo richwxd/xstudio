@@ -9,13 +9,13 @@ import com.xstudio.core.Msg;
 import com.xstudio.core.service.IAbstractService;
 import com.xstudio.http.RequestUtil;
 import com.xstudio.spring.web.SpringContextProvider;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -34,14 +34,14 @@ import java.util.Date;
 @Aspect
 @Component
 public class LogAspect {
-    private static final Logger logger = LogManager.getLogger(LogAspect.class);
+    private static final Logger logger = LoggerFactory.getLogger(LogAspect.class);
     private static Parser uaParser;
 
     {
         try {
             uaParser = new Parser();
         } catch (IOException e) {
-            logger.error(e);
+            logger.error("", e);
         }
     }
 

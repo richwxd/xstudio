@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
  * @author xiaobiao
  * @version 2020/2/3
  */
-public abstract class AbstractBaseRestController <Target extends BaseModelObject, Key> {
+public abstract class AbstractBaseRestController <Target extends BaseModelObject<Key>, Key> {
 
     /**
      * 获取服务

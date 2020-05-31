@@ -1,8 +1,8 @@
 package com.xstudio.core;
 
 import com.xstudio.core.exception.ClockMovedBackwardsException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,7 +20,7 @@ import java.util.Random;
  * @version 2020/2/3
  */
 public class IdWorker {
-    protected static final Logger logger = LogManager.getLogger(IdWorker.class);
+    protected static final Logger logger = LoggerFactory.getLogger(IdWorker.class);
 
     private static Random random = new Random();
 

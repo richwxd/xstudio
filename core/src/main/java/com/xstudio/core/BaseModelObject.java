@@ -2,7 +2,6 @@ package com.xstudio.core;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.xstudio.core.date.DateTime;
-import lombok.Data;
 
 import java.io.Serializable;
 
@@ -12,8 +11,8 @@ import java.io.Serializable;
  * @author xiaobiao
  * @version 2020/2/2
  */
-@Data
 public class BaseModelObject<K> implements Serializable {
+
     /**
      * 创建时间
      */
@@ -69,4 +68,35 @@ public class BaseModelObject<K> implements Serializable {
         setUpdateAt(null);
     }
 
+    public DateTime getCreateAt() {
+        return createAt;
+    }
+
+    public void setCreateAt(DateTime createAt) {
+        this.createAt = createAt;
+    }
+
+    public String getCreateBy() {
+        return createBy;
+    }
+
+    public void setCreateBy(String createBy) {
+        this.createBy = createBy;
+    }
+
+    public DateTime getUpdateAt() {
+        return updateAt;
+    }
+
+    public void setUpdateAt(DateTime updateAt) {
+        this.updateAt = updateAt;
+    }
+
+    public String getUpdateBy() {
+        return updateBy;
+    }
+
+    public void setUpdateBy(String updateBy) {
+        this.updateBy = updateBy;
+    }
 }

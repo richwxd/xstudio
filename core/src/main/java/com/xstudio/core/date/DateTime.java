@@ -1,8 +1,5 @@
 package com.xstudio.core.date;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
 import java.util.Date;
 
 /**
@@ -11,8 +8,6 @@ import java.util.Date;
  * @author xiaobiao
  * @version 2020/2/2
  */
-@Data
-@EqualsAndHashCode(callSuper = false)
 public class DateTime extends Date {
     /**
      * 开始时间
@@ -23,4 +18,20 @@ public class DateTime extends Date {
      * 结束时间
      */
     private Date end;
+
+    public Date getStart() {
+        return start;
+    }
+
+    public void setStart(Date start) {
+        this.start = start;
+    }
+
+    public Date getEnd() {
+        return end;
+    }
+
+    public void setEnd(Date end) {
+        this.end = end;
+    }
 }

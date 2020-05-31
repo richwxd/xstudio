@@ -14,7 +14,6 @@ import java.util.concurrent.TimeUnit;
  * @author xiaobiao
  * @version 2020/2/12
  */
-@Log4j2
 public class IpStrategy extends AbstractStrategy {
     @Override
     public boolean check(String key, HttpServletRequest request, int times, TimeUnit unit, RedisTemplate<Object, Object> redisTemplate) {

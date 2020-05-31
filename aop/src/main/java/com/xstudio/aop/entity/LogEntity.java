@@ -1,6 +1,5 @@
 package com.xstudio.aop.entity;
 
-import lombok.Data;
 import ua_parser.Client;
 
 import java.io.Serializable;
@@ -10,7 +9,6 @@ import java.util.Date;
  * @author xiaobiao
  * @version 2020/2/16
  */
-@Data
 public class LogEntity implements Serializable {
     /**
      * 执行方法的类
@@ -65,5 +63,77 @@ public class LogEntity implements Serializable {
 
         agent.setOs(client.os.family);
         agent.setOsVersion(client.os.major + client.os.minor + client.os.patch + client.os.patchMinor);
+    }
+
+    public String getClassName() {
+        return className;
+    }
+
+    public void setClassName(String className) {
+        this.className = className;
+    }
+
+    public String getMethodName() {
+        return methodName;
+    }
+
+    public void setMethodName(String methodName) {
+        this.methodName = methodName;
+    }
+
+    public Object getInputs() {
+        return inputs;
+    }
+
+    public void setInputs(Object inputs) {
+        this.inputs = inputs;
+    }
+
+    public Object getOutputs() {
+        return outputs;
+    }
+
+    public void setOutputs(Object outputs) {
+        this.outputs = outputs;
+    }
+
+    public Long getCost() {
+        return cost;
+    }
+
+    public void setCost(Long cost) {
+        this.cost = cost;
+    }
+
+    public String getActionName() {
+        return actionName;
+    }
+
+    public void setActionName(String actionName) {
+        this.actionName = actionName;
+    }
+
+    public Date getTime() {
+        return time;
+    }
+
+    public void setTime(Date time) {
+        this.time = time;
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
+    }
+
+    public UserAgent getAgent() {
+        return agent;
+    }
+
+    public void setAgent(UserAgent agent) {
+        this.agent = agent;
     }
 }

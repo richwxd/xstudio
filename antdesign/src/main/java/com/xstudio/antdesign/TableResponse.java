@@ -1,8 +1,5 @@
 package com.xstudio.antdesign;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
 import java.io.Serializable;
 import java.util.List;
 
@@ -12,8 +9,6 @@ import java.util.List;
  * @author xiaobiao
  * @version 2020/2/2
  */
-@Data
-@EqualsAndHashCode(callSuper = false)
 public class TableResponse<T> implements Serializable {
 
     private static final long serialVersionUID = 6323923218194260827L;
@@ -40,5 +35,21 @@ public class TableResponse<T> implements Serializable {
         pagination = new Pagination();
         this.pagination.setTotal(total);
         this.pagination.setCurrent(page);
+    }
+
+    public List<T> getList() {
+        return list;
+    }
+
+    public void setList(List<T> list) {
+        this.list = list;
+    }
+
+    public Pagination getPagination() {
+        return pagination;
+    }
+
+    public void setPagination(Pagination pagination) {
+        this.pagination = pagination;
     }
 }

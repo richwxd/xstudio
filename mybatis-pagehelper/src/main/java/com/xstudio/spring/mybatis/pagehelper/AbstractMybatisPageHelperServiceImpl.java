@@ -19,7 +19,7 @@ import java.util.List;
  * @author xiaobiao
  * @version 2020/2/3
  */
-public abstract class AbstractMybatisPageHelperServiceImpl<T extends BaseModelObject<K>, K> extends AbstractServiceImpl<T, K, PageBounds, PageResponse<T>, List<T>> implements IMybatisPageHelperService<T, K> {
+public abstract class AbstractMybatisPageHelperServiceImpl<T extends BaseModelObject<K>, K> extends AbstractServiceImpl<T, K, PageBounds, PageResponse<T>, Page<T>> {
 
     @Override
     public Msg<PageResponse<T>> fuzzySearch(T record) {

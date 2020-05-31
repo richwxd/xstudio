@@ -16,7 +16,7 @@ import java.util.List;
  * @author xiaobiao
  * @version 2020/2/3
  */
-public abstract class AbstractRestController<Target extends BaseModelObject, Key> extends AbstractBaseRestController<Target, Key> {
+public abstract class AbstractRestController<Target extends BaseModelObject<Key>, Key> extends AbstractBaseRestController<Target, Key> {
 
     @GetMapping(value = {"table"})
     public Msg<TableResponse<Target>> table(Target object, PageRequest pageRequest, HttpServletRequest request, HttpServletResponse response) {

@@ -4,8 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.support.spring.FastJsonRedisSerializer;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.connection.*;
 import org.springframework.data.redis.connection.jedis.JedisClientConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
@@ -25,7 +25,7 @@ import java.util.List;
  * @version 2020/2/12
  */
 public class RedisConfigurationUtil {
-    private static Logger log = LogManager.getLogger(RedisConfigurationUtil.class);
+    private static Logger log = LoggerFactory.getLogger(RedisConfigurationUtil.class);
 
     public static RedisTemplate<Object, Object> getRedisTemplate(BasicRedisProperties redisProperties) {
         RedisConfiguration configuration = null;

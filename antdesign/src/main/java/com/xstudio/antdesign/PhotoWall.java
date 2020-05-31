@@ -1,8 +1,5 @@
 package com.xstudio.antdesign;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import java.io.Serializable;
 
 /**
@@ -11,8 +8,6 @@ import java.io.Serializable;
  * @author xiaobiao
  * @version 2020/2/2
  */
-@Data
-@NoArgsConstructor
 public class PhotoWall implements Serializable {
 
     private static final long serialVersionUID = -3107187952595288288L;
@@ -41,6 +36,49 @@ public class PhotoWall implements Serializable {
      * 缩略图地址
      */
     private String thumbUrl;
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getThumbUrl() {
+        return thumbUrl;
+    }
+
+    public void setThumbUrl(String thumbUrl) {
+        this.thumbUrl = thumbUrl;
+    }
+
+    public PhotoWall() {
+    }
 
     /**
      * @param uid 图片ID

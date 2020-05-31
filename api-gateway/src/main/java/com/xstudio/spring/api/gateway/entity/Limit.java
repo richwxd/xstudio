@@ -1,7 +1,5 @@
 package com.xstudio.spring.api.gateway.entity;
 
-import lombok.Getter;
-
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -10,11 +8,17 @@ import java.util.concurrent.TimeUnit;
  */
 
 public class Limit {
-    @Getter
     int times = 10;
 
-    @Getter
     TimeUnit unit = TimeUnit.SECONDS;
+
+    public int getTimes() {
+        return times;
+    }
+
+    public TimeUnit getUnit() {
+        return unit;
+    }
 
     public Limit(int times, TimeUnit unit) {
         this.times = times;

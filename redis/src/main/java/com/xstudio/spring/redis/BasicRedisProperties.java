@@ -1,7 +1,5 @@
 package com.xstudio.spring.redis;
 
-import lombok.Data;
-
 import java.time.Duration;
 import java.util.List;
 
@@ -9,7 +7,6 @@ import java.util.List;
  * @author xiaobiao
  * @version 2020/2/12
  */
-@Data
 public class BasicRedisProperties {
     private String name = "";
     /**
@@ -254,5 +251,93 @@ public class BasicRedisProperties {
             this.pool = pool;
         }
 
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getDatabase() {
+        return database;
+    }
+
+    public void setDatabase(int database) {
+        this.database = database;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getHost() {
+        return host;
+    }
+
+    public void setHost(String host) {
+        this.host = host;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
+    }
+
+    public boolean isSsl() {
+        return ssl;
+    }
+
+    public void setSsl(boolean ssl) {
+        this.ssl = ssl;
+    }
+
+    public Duration getTimeout() {
+        return timeout;
+    }
+
+    public void setTimeout(Duration timeout) {
+        this.timeout = timeout;
+    }
+
+    public Sentinel getSentinel() {
+        return sentinel;
+    }
+
+    public void setSentinel(Sentinel sentinel) {
+        this.sentinel = sentinel;
+    }
+
+    public Cluster getCluster() {
+        return cluster;
+    }
+
+    public void setCluster(Cluster cluster) {
+        this.cluster = cluster;
+    }
+
+    public Jedis getJedis() {
+        return jedis;
+    }
+
+    public Lettuce getLettuce() {
+        return lettuce;
     }
 }

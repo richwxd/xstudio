@@ -1,6 +1,5 @@
 package com.xstudio.http;
 
-import lombok.Data;
 import org.apache.http.HttpVersion;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -12,7 +11,6 @@ import java.io.Serializable;
  * @author xiaobiao
  * @version 2020/2/12
  */
-@Data
 public class ClientResponse implements Serializable {
     /**
      * 请求对象
@@ -49,5 +47,21 @@ public class ClientResponse implements Serializable {
             return 500;
         }
         return this.getOrigin().getStatusLine().getStatusCode();
+    }
+
+    public CloseableHttpResponse getOrigin() {
+        return origin;
+    }
+
+    public void setOrigin(CloseableHttpResponse origin) {
+        this.origin = origin;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
     }
 }

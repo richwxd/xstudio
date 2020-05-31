@@ -1,7 +1,8 @@
 package com.xstudio.core;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
 
@@ -10,7 +11,7 @@ import java.lang.reflect.Method;
  * @version 2020/2/16
  */
 public class JavaBeansUtil {
-    private static final Logger logger = LogManager.getLogger(JavaBeansUtil.class);
+    private static final Logger logger = LoggerFactory.getLogger(JavaBeansUtil.class);
 
     private JavaBeansUtil() {
         throw new UnsupportedOperationException("AspectJUtils can't be instantiated");

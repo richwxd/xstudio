@@ -1,8 +1,8 @@
 package com.xstudio.spring.mybatis.pagehelper;
 
+import com.github.pagehelper.Page;
 import com.xstudio.core.service.IAbstractDao;
 import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.session.RowBounds;
 
 import java.util.List;
 
@@ -12,7 +12,7 @@ import java.util.List;
  * @author xiaobiao
  * @version 2020/2/3
  */
-public interface IMybatisPageHelperDao<T, K> extends IAbstractDao<T, K, RowBounds, List<T>> {
+public interface IMybatisPageHelperDao<T, K> extends IAbstractDao<T, K, PageBounds, Page<T>> {
     /**
      * 统计总数
      *
@@ -67,7 +67,7 @@ public interface IMybatisPageHelperDao<T, K> extends IAbstractDao<T, K, RowBound
      * @return 对象list
      */
     @Override
-    List<T> selectByExample(@Param("example") T record, @Param("pageBounds") RowBounds pageBounds);
+    Page<T> selectByExample(@Param("example") T record, @Param("pageBounds") PageBounds pageBounds);
 
     /**
      * 按条件获取（含大字段）
@@ -77,7 +77,7 @@ public interface IMybatisPageHelperDao<T, K> extends IAbstractDao<T, K, RowBound
      * @return 对象list
      */
     @Override
-    List<T> selectByExampleWithBLOBs(@Param("example") T record, @Param("pageBounds") RowBounds pageBounds);
+    Page<T> selectByExampleWithBLOBs(@Param("example") T record, @Param("pageBounds") PageBounds pageBounds);
 
     /**
      * 分页模糊搜索
@@ -87,5 +87,5 @@ public interface IMybatisPageHelperDao<T, K> extends IAbstractDao<T, K, RowBound
      * @return 对象list
      */
     @Override
-    List<T> fuzzySearchByPager(@Param("example") T record, @Param("pageBounds") RowBounds pageBounds);
+    Page<T> fuzzySearchByPager(@Param("example") T record, @Param("pageBounds") PageBounds pageBounds);
 }

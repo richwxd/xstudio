@@ -11,7 +11,6 @@ import java.util.List;
  * @author xiaobiao
  * @version 2020/2/2
  */
-@Data
 public class Msg<T> implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -70,5 +69,37 @@ public class Msg<T> implements Serializable {
 
     public boolean isSuccess() {
         return code == 0;
+    }
+
+    public int getCode() {
+        return code;
+    }
+
+    public void setCode(int code) {
+        this.code = code;
+    }
+
+    public T getData() {
+        return data;
+    }
+
+    public void setData(T data) {
+        this.data = data;
+    }
+
+    public String getMsg() {
+        return msg;
+    }
+
+    public void setMsg(String msg) {
+        this.msg = msg;
+    }
+
+    public List<String> getMsgs() {
+        return msgs;
+    }
+
+    public void setMsgs(List<String> msgs) {
+        this.msgs = msgs;
     }
 }

@@ -1,9 +1,5 @@
 package com.xstudio.antdesign;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import java.io.Serializable;
 
 /**
@@ -12,9 +8,6 @@ import java.io.Serializable;
  * @author xiaobiao
  * @version 2020/2/2
  */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class Pagination implements Serializable {
     private static final long serialVersionUID = -9122189141426414394L;
     /**
@@ -31,6 +24,9 @@ public class Pagination implements Serializable {
      */
     private Integer pageSize;
 
+    public Pagination() {
+    }
+
     /**
      * @param total   总数
      * @param current 当前页
@@ -40,4 +36,27 @@ public class Pagination implements Serializable {
         this.current = current;
     }
 
+    public Integer getTotal() {
+        return total;
+    }
+
+    public void setTotal(Integer total) {
+        this.total = total;
+    }
+
+    public Integer getCurrent() {
+        return current;
+    }
+
+    public void setCurrent(Integer current) {
+        this.current = current;
+    }
+
+    public Integer getPageSize() {
+        return pageSize;
+    }
+
+    public void setPageSize(Integer pageSize) {
+        this.pageSize = pageSize;
+    }
 }
