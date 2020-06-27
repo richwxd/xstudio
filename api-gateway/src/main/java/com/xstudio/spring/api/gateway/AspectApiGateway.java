@@ -45,6 +45,7 @@ public class AspectApiGateway {
 
         ApiGateway annotation = getAnnotation(annotations);
 
+        assert annotation != null;
         ApiGatewayStrategy[] strategies = annotation.strategies();
 
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();

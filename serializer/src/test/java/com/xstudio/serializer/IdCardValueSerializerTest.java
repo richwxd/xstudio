@@ -1,8 +1,8 @@
 package com.xstudio.serializer;
 
 import com.alibaba.fastjson.serializer.JSONSerializer;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author xiaobiao
@@ -17,6 +17,6 @@ public class IdCardValueSerializerTest {
         String idcard = "350948271636253716";
         idCardValueSerializer.write(jsonSerializer, idcard,null,null,0);
 
-        Assert.assertEquals("\"35************3716\"", jsonSerializer.toString());
+        Assertions.assertEquals("\"35************3716\"", jsonSerializer.toString());
     }
 }

@@ -1,4 +1,5 @@
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import ua_parser.Client;
 import ua_parser.Parser;
 
@@ -15,6 +16,6 @@ public class UaParserTest {
 
         Parser uaParser = new Parser();
         Client c = uaParser.parse(uaString);
-        System.out.printf(c.toString());
+        Assertions.assertNotNull(c);
     }
 }

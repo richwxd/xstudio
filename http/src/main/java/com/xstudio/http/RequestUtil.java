@@ -621,17 +621,22 @@ public class RequestUtil {
      * @return get请求参数
      * @throws UnsupportedEncodingException {@link UnsupportedEncodingException}
      */
-    public static String getCanonicalQueryString(Map<String, String> params) throws UnsupportedEncodingException {
+    public static String getCanonicalQueryString(Map<String, Object> params) throws UnsupportedEncodingException {
         StringBuilder queryString = new StringBuilder("");
-        Set<Map.Entry<String, String>> entries = params.entrySet();
+        Set<Map.Entry<String, Object>> entries = params.entrySet();
         String value;
-        for (Map.Entry<String, String> entry : entries) {
-            try {
-                value = URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8.name());
-            } catch (UnsupportedEncodingException e) {
-                throw new UnsupportedEncodingException(e.getMessage());
+        for (Map.Entry<String, Object> entry : entries) {
+            queryString.append("&").append(entry.getKey());
+            if (null != entry.getValue()) {
+                try {
+                    value = URLEncoder.encode(String.valueOf(entry.getValue()), StandardCharsets.UTF_8.name());
+                    if (null != value) {
+                        queryString.append("=").append(value);
+                    }
+                } catch (UnsupportedEncodingException e) {
+                    throw new UnsupportedEncodingException(e.getMessage());
+                }
             }
-            queryString.append("&").append(entry.getKey()).append("=").append(value);
         }
 
         return queryString.toString().substring(1);

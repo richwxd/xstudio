@@ -20,7 +20,6 @@ public class DateConverter implements Converter<String, Date> {
         try {
             return DateUtils.parseDate(source);
         } catch (ParseException e) {
-            // todo
             return null;
         }
     }

@@ -25,7 +25,7 @@ import java.util.List;
  * @version 2020/2/12
  */
 public class RedisConfigurationUtil {
-    private static Logger log = LoggerFactory.getLogger(RedisConfigurationUtil.class);
+    private static final Logger log = LoggerFactory.getLogger(RedisConfigurationUtil.class);
 
     public static RedisTemplate<Object, Object> getRedisTemplate(BasicRedisProperties redisProperties) {
         RedisConfiguration configuration = null;

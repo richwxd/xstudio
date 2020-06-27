@@ -19,12 +19,12 @@ public class NumberToStarsSerializer implements ObjectSerializer {
     /**
      * 大部分敏感词汇在10个以内，直接返回缓存的字符串
      */
-    private static String[] starArr = {"*", "**", "***", "****", "*****", "******", "*******", "********", "*********", "**********"};
+    private static final String[] starArr = {"*", "**", "***", "****", "*****", "******", "*******", "********", "*********", "**********"};
 
     /**
      * 提取文案中的数字正则表达式
      */
-    private static Pattern pattern = Pattern.compile(".*?(\\d+).*?");
+    private static final Pattern pattern = Pattern.compile(".*?(\\d+).*?");
 
     /**
      * 生成n个星号的字符串

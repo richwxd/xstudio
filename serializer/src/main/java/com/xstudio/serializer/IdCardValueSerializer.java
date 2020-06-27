@@ -21,7 +21,7 @@ public class IdCardValueSerializer implements ObjectSerializer {
     /**
      * 大部分敏感词汇在10个以内，直接返回缓存的字符串
      */
-    private static Map<Integer, String> starArr = new HashMap<Integer, String>(){
+    private static final Map<Integer, String> starArr = new HashMap<Integer, String>(){
         {
             put(12, "************");
             put(10, "************");

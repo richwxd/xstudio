@@ -15,7 +15,7 @@ import java.util.List;
  * @version 2020/2/2
  */
 public abstract class AbstractServiceImpl<T extends BaseModelObject<K>, K, P, L extends List<T>, M extends List<T>> implements IAbstractService<T, K, P, L, M> {
-    private static int batchPerSqlNumber = 100;
+    public static int batchPerSqlNumber = 100;
 
     @Override
     public Long countByExample(T record) {
@@ -123,7 +123,7 @@ public abstract class AbstractServiceImpl<T extends BaseModelObject<K>, K, P, L 
         }
 
         // 重新获取数据
-        T dbRecord = (T) getRepositoryDao().selectByPrimaryKey(record.valueOfKey());
+        T dbRecord = getRepositoryDao().selectByPrimaryKey(record.valueOfKey());
         msg.setData(dbRecord);
         return msg;
     }
