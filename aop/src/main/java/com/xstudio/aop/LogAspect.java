@@ -1,11 +1,10 @@
 package com.xstudio.aop;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.xstudio.aop.annotation.Log;
 import com.xstudio.aop.entity.LogEntity;
 import com.xstudio.aop.service.ILogService;
-import com.xstudio.core.Msg;
+import com.xstudio.core.JsonUtil;
+import com.xstudio.core.ApiResponse;
 import com.xstudio.core.service.IAbstractService;
 import com.xstudio.http.RequestUtil;
 import com.xstudio.spring.web.SpringContextProvider;
@@ -26,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Date;
+import java.util.Map;
 
 /**
  * @author xiaobiao
@@ -85,9 +85,9 @@ public class LogAspect {
         if (doSelect) {
             IAbstractService selectService = (IAbstractService) SpringContextProvider.getBean((annotation).selectService());
             String id = annotation.id();
-            JSONObject parse = JSON.parseObject((String) arg[0]);
-            Msg<Object> msg = selectService.selectByPrimaryKey(parse.get(id));
-            arg[0] = msg.getData();
+            Map<String, Object> parse = JsonUtil.toMap((String) arg[0]);
+            ApiResponse<Object> apiResponse = selectService.selectByPrimaryKey(parse.get(id));
+            arg[0] = apiResponse.getData();
         }
 
         Date actionTime = new Date();

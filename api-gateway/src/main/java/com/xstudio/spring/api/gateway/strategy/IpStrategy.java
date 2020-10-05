@@ -2,7 +2,6 @@ package com.xstudio.spring.api.gateway.strategy;
 
 import com.xstudio.http.RequestUtil;
 import com.xstudio.spring.redis.RedisUtil;
-import lombok.extern.log4j.Log4j2;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import javax.servlet.http.HttpServletRequest;

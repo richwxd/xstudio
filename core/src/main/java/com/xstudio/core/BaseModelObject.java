@@ -1,6 +1,6 @@
 package com.xstudio.core;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.xstudio.core.date.DateTime;
 
 import java.io.Serializable;
@@ -11,12 +11,12 @@ import java.io.Serializable;
  * @author xiaobiao
  * @version 2020/2/2
  */
-public class BaseModelObject<K> implements Serializable {
+public abstract class BaseModelObject<K> implements Serializable {
 
     /**
      * 创建时间
      */
-    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private DateTime createAt;
 
     /**
@@ -27,7 +27,7 @@ public class BaseModelObject<K> implements Serializable {
     /**
      * 更新时间
      */
-    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private DateTime updateAt;
 
     /**
@@ -35,14 +35,17 @@ public class BaseModelObject<K> implements Serializable {
      */
     private String updateBy;
 
+
+    public K getKey() {
+        return valueOfKey();
+    }
+
     /**
      * 获取主键
      *
      * @return K
      */
-    public K valueOfKey() {
-        return null;
-    }
+    public abstract K valueOfKey();
 
 
     /**
@@ -50,16 +53,15 @@ public class BaseModelObject<K> implements Serializable {
      *
      * @param value 主键值
      */
-    public void assignKeyValue(K value) {
-    }
+    public abstract void assignKeyValue(K value);
 
     /**
-     * 清楚铭感信息
-     * 创建人ID
-     * 更新人ID
-     * 创建时间
-     * 更新时间
-     * 租户ID
+     * 清除铭感信息：<br>
+     * 创建人ID<br>
+     * 更新人ID<br>
+     * 创建时间<br>
+     * 更新时间<br>
+     * 租户ID<br>
      */
     public void emptySensitiveInfo() {
         setCreateBy(null);

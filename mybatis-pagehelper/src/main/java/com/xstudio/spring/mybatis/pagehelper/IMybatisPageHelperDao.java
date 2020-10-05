@@ -16,11 +16,11 @@ public interface IMybatisPageHelperDao<T, K> extends IAbstractDao<T, K, PageBoun
     /**
      * 统计总数
      *
-     * @param record 统计条件
+     * @param example 统计条件
      * @return 统计结果
      */
     @Override
-    Long countByExample(@Param("example") T record);
+    Long countByExample(@Param("example") T example);
 
     /**
      * 主键获取
@@ -62,30 +62,30 @@ public interface IMybatisPageHelperDao<T, K> extends IAbstractDao<T, K, PageBoun
     /**
      * 按条件获取（不含大字段）
      *
-     * @param record     条件
+     * @param exmaple     条件
      * @param pageBounds 分页参数
      * @return 对象list
      */
     @Override
-    Page<T> selectByExample(@Param("example") T record, @Param("pageBounds") PageBounds pageBounds);
+    Page<T> selectByExample(@Param("example") T exmaple, @Param("pageBounds") PageBounds pageBounds);
 
     /**
      * 按条件获取（含大字段）
      *
-     * @param record     条件
+     * @param example     条件
      * @param pageBounds 分页参数
      * @return 对象list
      */
     @Override
-    Page<T> selectByExampleWithBLOBs(@Param("example") T record, @Param("pageBounds") PageBounds pageBounds);
+    Page<T> selectByExampleWithBLOBs(@Param("example") T example, @Param("pageBounds") PageBounds pageBounds);
 
     /**
      * 分页模糊搜索
      *
-     * @param record     对象
+     * @param example     对象
      * @param pageBounds 分页参数
      * @return 对象list
      */
     @Override
-    Page<T> fuzzySearchByPager(@Param("example") T record, @Param("pageBounds") PageBounds pageBounds);
+    Page<T> fuzzySearchByPager(@Param("example") T example, @Param("pageBounds") PageBounds pageBounds);
 }

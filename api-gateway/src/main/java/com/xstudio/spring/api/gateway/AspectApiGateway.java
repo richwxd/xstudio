@@ -1,7 +1,7 @@
 package com.xstudio.spring.api.gateway;
 
-import com.xstudio.core.ErrorConstant;
-import com.xstudio.core.Msg;
+import com.xstudio.core.ApiResponse;
+import com.xstudio.core.ErrorCodeConstant;
 import com.xstudio.spring.api.gateway.annotation.ApiGateway;
 import com.xstudio.spring.api.gateway.annotation.ApiGatewayStrategy;
 import com.xstudio.spring.api.gateway.entity.Limit;
@@ -70,9 +70,9 @@ public class AspectApiGateway {
                     (RedisTemplate<Object, Object>) SpringContextProvider.getBean(annotation.redisTemplateBean())
             );
             if (Boolean.FALSE.equals(checkResult)) {
-                Msg<Object> msg = new Msg<>();
-                msg.setResult(ErrorConstant.API_LIMIT, ErrorConstant.API_LIMIT_MSG);
-                return msg;
+                ApiResponse<Object> apiResponse = new ApiResponse<>();
+                apiResponse.setResult(ErrorCodeConstant.API_LIMIT, ErrorCodeConstant.API_LIMIT_MSG);
+                return apiResponse;
             }
         }
 

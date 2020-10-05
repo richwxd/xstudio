@@ -1,9 +1,10 @@
 package com.xstudio.serializer;
 
-import com.alibaba.fastjson.serializer.JSONSerializer;
-import com.alibaba.fastjson.serializer.ObjectSerializer;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
 
-import java.lang.reflect.Type;
+import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,7 +16,7 @@ import java.util.regex.Pattern;
  * @author xiaobiao
  * @version 2020/2/2
  */
-public class NumberToStarsSerializer implements ObjectSerializer {
+public class NumberToStarsSerializer extends JsonSerializer<String> {
     /**
      * 大部分敏感词汇在10个以内，直接返回缓存的字符串
      */
@@ -50,14 +51,13 @@ public class NumberToStarsSerializer implements ObjectSerializer {
     }
 
     @Override
-    public void write(JSONSerializer serializer, Object object, Object fieldName, Type fieldType, int features) {
-        String value = (String) object;
+    public void serialize(String value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
         Matcher matcher = pattern.matcher(value);
         int length = value.length();
         if (matcher.find()) {
             length = matcher.group(1).length();
         }
         String text = value.replaceAll("(\\d{1})\\d+(\\d{1})", "$1" + getStarChar(length - 2) + "$2");
-        serializer.write(text);
+        gen.writeString(text);
     }
 }

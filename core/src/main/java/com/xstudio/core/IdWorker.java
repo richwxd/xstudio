@@ -22,12 +22,12 @@ import java.util.Random;
 public class IdWorker {
     protected static final Logger logger = LoggerFactory.getLogger(IdWorker.class);
 
-    private static Random random = new Random();
+    private static final Random random = new Random();
 
-    private static Map<String, IdWorker> idWorkers = new HashMap<>();
+    private static final Map<String, IdWorker> idWorkers = new HashMap<>();
 
-    private long workerId;
-    private long dataCenterId;
+    private final long workerId;
+    private final long dataCenterId;
 
     /**
      * 并发控制, 0
@@ -36,30 +36,18 @@ public class IdWorker {
     /**
      * sequence值控制在0-4095
      */
-    private long sequenceBits = 12L;
+    private final long sequenceBits = 12L;
     /**
      * 只允许workid的范围为：0-1023
      */
-    private long workerIdBits = 5L;
+    private final long workerIdBits = 5L;
 
-    private long dataCenterIdBits = 5L;
+    private final long dataCenterIdBits = 5L;
 
-    private long maxDataCenterId = ~(-1L << dataCenterIdBits);
-
-    /**
-     * 12
-     */
-    private long workerIdShift = sequenceBits;
     /**
      * 22
      */
-    private long timestampLeftShift = sequenceBits + workerIdBits + dataCenterIdBits;
-    /**
-     * 4095,111111111111,12位
-     */
-    private long sequenceMask = ~(-1L << sequenceBits);
-
-    private long dataCenterIdShift = sequenceBits + workerIdBits;
+    private final long timestampLeftShift = sequenceBits + workerIdBits + dataCenterIdBits;
 
 
     private long lastTimestamp = -1L;
@@ -81,10 +69,6 @@ public class IdWorker {
         return idWorker.nextId();
     }
 
-    public static String getIdString() {
-        return String.valueOf(getId());
-    }
-
     private static long getDataCenterId() {
         return random.nextInt(31);
     }
@@ -99,6 +83,7 @@ public class IdWorker {
         if (workerId > maxWorkerId || workerId < 0) {
             throw new IllegalArgumentException(String.format("worker Id can't be greater than %d or less than 0", maxWorkerId));
         }
+        long maxDataCenterId = ~(-1L << dataCenterIdBits);
         if (dataCenterId > maxDataCenterId || dataCenterId < 0) {
             throw new IllegalArgumentException(String.format("dataCenter Id can't be greater than %d or less than 0", maxDataCenterId));
         }
@@ -120,6 +105,10 @@ public class IdWorker {
         }
         // 如果上一个timestamp与新产生的相等，则sequence加一(0-4095循环)，下次再使用时sequence是新值
         if (lastTimestamp == timestamp) {
+            /*
+             * 4095,111111111111,12位
+             */
+            long sequenceMask = ~(-1L << sequenceBits);
             sequence = (sequence + 1) & sequenceMask;
             // 毫秒内序列溢出
             if (sequence == 0) {
@@ -137,7 +126,11 @@ public class IdWorker {
          * 起始标记点，作为基准
          */
         long twepoch = 1288834974657L;
-        return ((timestamp - twepoch) << timestampLeftShift) | (dataCenterId << dataCenterIdShift) | (workerId << workerIdShift) | sequence;
+        long dataCenterIdShift = sequenceBits + workerIdBits;
+        /*
+         * 12
+         */
+        return ((timestamp - twepoch) << timestampLeftShift) | (dataCenterId << dataCenterIdShift) | (workerId << sequenceBits) | sequence;
     }
 
     /**

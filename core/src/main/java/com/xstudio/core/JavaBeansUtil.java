@@ -14,7 +14,7 @@ public class JavaBeansUtil {
     private static final Logger logger = LoggerFactory.getLogger(JavaBeansUtil.class);
 
     private JavaBeansUtil() {
-        throw new UnsupportedOperationException("AspectJUtils can't be instantiated");
+        throw new UnsupportedOperationException("JavaBeansUtil can't be instantiated");
     }
 
     /**
@@ -26,9 +26,7 @@ public class JavaBeansUtil {
         String methodName = getSetterMethodName(fieldName);
         try {
             Method setMethod = obj.getClass().getMethod(methodName, value.getClass());
-            if (null != setMethod) {
-                setMethod.invoke(obj, value);
-            }
+            setMethod.invoke(obj, value);
         } catch (Exception e) {
             logger.warn("没有 {} 对应的set方法 值 \"{}\"", fieldName, value);
         }
@@ -93,8 +91,7 @@ public class JavaBeansUtil {
      * @param firstCharacterUppercase the first character uppercase
      * @return the camel case string
      */
-    public static String getCamelCaseString(String inputString,
-                                            boolean firstCharacterUppercase) {
+    public static String getCamelCaseString(String inputString, boolean firstCharacterUppercase) {
         StringBuilder sb = new StringBuilder();
 
         boolean nextUpperCase = false;

@@ -11,22 +11,41 @@ subprojects {
 
     repositories {
         maven {
-            url 'http://maven.aliyun.com/nexus/content/groups/public/'
+            url "https://maven.aliyun.com/repository/public"
         }
         maven {
-            url 'http://maven.aliyun.com/nexus/content/repositories/jcenter'
+            url "https://maven.aliyun.com/repository/jcenter"
+        }
+        maven {
+            url "https://maven.aliyun.com/repository/spring"
+        }
+        maven {
+            url "https://maven.aliyun.com/repository/spring-plugin"
+        }
+        maven {
+            url "https://maven.aliyun.com/repository/gradle-plugin"
+        }
+        maven {
+            url "https://maven.aliyun.com/repository/google"
+        }
+        maven {
+            url "https://maven.aliyun.com/repository/grails-core"
+        }
+        maven {
+            url "https://maven.aliyun.com/repository/apache-snapshots"
         }
         mavenCentral()
         mavenLocal()
     }
 
     dependencies {
-        compile "org.projectlombok:lombok:1.18.10"
-        annotationProcessor "org.projectlombok:lombok:1.18.10"
-
-        // https://mvnrepository.com/artifact/com.alibaba/fastjson
-        compile group: 'com.alibaba', name: 'fastjson', version: '1.2.62'
         compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
+        // add slf4j-simple to fix 'Failed to load class org.slf4j.impl.StaticLoggerBinder' error
+        testCompile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.30'
+
+        compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.11.2'
+        compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.11.2'
+        compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.2'
 
         testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.2'
         testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.2'
@@ -40,7 +59,13 @@ subprojects {
         println project.name
     }
 
-    [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+    compileJava.options.encoding = "UTF-8"
+    compileTestJava.options.encoding = "UTF-8"
+
+    tasks.withType(JavaCompile) {
+        options.encoding = "UTF-8"
+    }
+
     // 打包源码
     task sourceJar(type: Jar, dependsOn: classes) {
         classifier 'sources'

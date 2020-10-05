@@ -18,33 +18,6 @@ public class RequestUtilTest {
         // URL列表数组
         String[] urisToGet = {
                 "https://restapi.amap.com/v3/ip?key=0f0435e9f4b657862cc5036693c041df&ip=114.247.50.2",
-                "https://restapi.amap.com/v3/ip?key=0f0435e9f4b657862cc5036693c041df&ip=114.247.50.2",
-                "https://restapi.amap.com/v3/ip?key=0f0435e9f4b657862cc5036693c041df&ip=114.247.50.2",
-                "https://restapi.amap.com/v3/ip?key=0f0435e9f4b657862cc5036693c041df&ip=114.247.50.2",
-
-                "https://restapi.amap.com/v3/ip?key=0f0435e9f4b657862cc5036693c041df&ip=114.247.50.2",
-                "https://restapi.amap.com/v3/ip?key=0f0435e9f4b657862cc5036693c041df&ip=114.247.50.2",
-                "https://restapi.amap.com/v3/ip?key=0f0435e9f4b657862cc5036693c041df&ip=114.247.50.2",
-                "https://restapi.amap.com/v3/ip?key=0f0435e9f4b657862cc5036693c041df&ip=114.247.50.2",
-
-                "https://restapi.amap.com/v3/ip?key=0f0435e9f4b657862cc5036693c041df&ip=114.247.50.2",
-                "https://restapi.amap.com/v3/ip?key=0f0435e9f4b657862cc5036693c041df&ip=114.247.50.2",
-                "https://restapi.amap.com/v3/ip?key=0f0435e9f4b657862cc5036693c041df&ip=114.247.50.2",
-                "https://restapi.amap.com/v3/ip?key=0f0435e9f4b657862cc5036693c041df&ip=114.247.50.2",
-
-                "https://restapi.amap.com/v3/ip?key=0f0435e9f4b657862cc5036693c041df&ip=114.247.50.2",
-                "https://restapi.amap.com/v3/ip?key=0f0435e9f4b657862cc5036693c041df&ip=114.247.50.2",
-                "https://restapi.amap.com/v3/ip?key=0f0435e9f4b657862cc5036693c041df&ip=114.247.50.2",
-                "https://restapi.amap.com/v3/ip?key=0f0435e9f4b657862cc5036693c041df&ip=114.247.50.2",
-
-                "https://restapi.amap.com/v3/ip?key=0f0435e9f4b657862cc5036693c041df&ip=114.247.50.2",
-                "https://restapi.amap.com/v3/ip?key=0f0435e9f4b657862cc5036693c041df&ip=114.247.50.2",
-                "https://restapi.amap.com/v3/ip?key=0f0435e9f4b657862cc5036693c041df&ip=114.247.50.2",
-                "https://restapi.amap.com/v3/ip?key=0f0435e9f4b657862cc5036693c041df&ip=114.247.50.2",
-
-                "https://restapi.amap.com/v3/ip?key=0f0435e9f4b657862cc5036693c041df&ip=114.247.50.2",
-                "https://restapi.amap.com/v3/ip?key=0f0435e9f4b657862cc5036693c041df&ip=114.247.50.2",
-                "https://restapi.amap.com/v3/ip?key=0f0435e9f4b657862cc5036693c041df&ip=114.247.50.2",
                 "https://restapi.amap.com/v3/ip?key=0f0435e9f4b657862cc5036693c041df&ip=114.247.50.2" };
 
         long start = System.currentTimeMillis();

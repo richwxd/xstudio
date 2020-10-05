@@ -3,10 +3,11 @@ package com.xstudio.spring.mybatis.pagehelper;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.xstudio.antdesign.Pagination;
+import com.xstudio.core.ApiResponse;
 import com.xstudio.core.BaseModelObject;
-import com.xstudio.core.ErrorConstant;
-import com.xstudio.core.Msg;
+import com.xstudio.core.ErrorCodeConstant;
 import com.xstudio.core.service.AbstractServiceImpl;
+import com.xstudio.core.service.IAbstractDao;
 import com.xstudio.spring.mybatis.antdesign.PageResponse;
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -22,85 +23,47 @@ import java.util.List;
 public abstract class AbstractMybatisPageHelperServiceImpl<T extends BaseModelObject<K>, K> extends AbstractServiceImpl<T, K, PageBounds, PageResponse<T>, Page<T>> {
 
     @Override
-    public Msg<PageResponse<T>> fuzzySearch(T record) {
-        Msg<PageResponse<T>> msg = new Msg<>();
-        Msg<PageResponse<T>> pageListMsg = new Msg<>();
+    public ApiResponse<PageResponse<T>> fuzzySearch(T example) {
+        ApiResponse<PageResponse<T>> apiResponse = new ApiResponse<>();
+        ApiResponse<PageResponse<T>> pageListApiResponse = new ApiResponse<>();
         List<T> list = new ArrayList<>();
         int limit = 5000;
         int offset = 0;
         PageBounds pageBounds = new PageBounds(offset, limit);
         boolean doLoop = true;
-        while (Boolean.TRUE.equals(pageListMsg.isSuccess()) && doLoop) {
-            pageListMsg = fuzzySearchByPager(record, pageBounds);
-            if (Boolean.TRUE.equals(pageListMsg.isSuccess())) {
-                doLoop = pageListMsg.getData().size() >= limit;
-                list.addAll(pageListMsg.getData());
+        while (Boolean.TRUE.equals(pageListApiResponse.isSuccess()) && doLoop) {
+            pageListApiResponse = fuzzySearchByPager(example, pageBounds);
+            if (Boolean.TRUE.equals(pageListApiResponse.isSuccess())) {
+                doLoop = pageListApiResponse.getData().size() >= limit;
+                list.addAll(pageListApiResponse.getData());
             }
             offset = offset + limit;
             pageBounds = new PageBounds(offset, limit);
         }
 
         if (list.isEmpty()) {
-            msg.setResult(ErrorConstant.NO_MATCH, ErrorConstant.NO_MATCH_MSG);
-            return msg;
+            apiResponse.setResult(ErrorCodeConstant.NO_MATCH, ErrorCodeConstant.NO_MATCH_MSG);
+            return apiResponse;
         }
         PageResponse<T> pageList = new PageResponse<>(list, pageBounds.getTotal(), 1);
-        msg.setData(pageList);
-        return msg;
+        apiResponse.setData(pageList);
+        return apiResponse;
     }
 
     @Override
-    public Msg<PageResponse<T>> fuzzySearchByPager(T record, PageBounds pageBounds) {
-        Msg<PageResponse<T>> msg = new Msg<>();
-        PageHelper.startPage(pageBounds.getPage(), pageBounds.getLimit());
+    public ApiResponse<PageResponse<T>> fuzzySearchByPager(T example, PageBounds pageBounds) {
+        ApiResponse<PageResponse<T>> apiResponse = new ApiResponse<>();
         PageHelper.orderBy(pageBounds.getOrders());
-        Page<T> result = (Page<T>) getRepositoryDao().fuzzySearch(record);
+        PageHelper.startPage(pageBounds.getPage(), pageBounds.getLimit());
+        Page<T> result = getRepositoryDao().fuzzySearch(example);
         if (result.isEmpty()) {
-            msg.setResult(ErrorConstant.NO_MATCH, ErrorConstant.NO_MATCH_MSG);
-            return msg;
+            apiResponse.setResult(ErrorCodeConstant.NO_MATCH, ErrorCodeConstant.NO_MATCH_MSG);
+            return apiResponse;
         }
         PageResponse<T> pageList = new PageResponse<>(result, pageBounds.getTotal(), 1);
-        msg.setData(pageList);
+        apiResponse.setData(pageList);
 
-        return msg;
-    }
-
-    @Override
-    public Msg<PageResponse<T>> selectAllByExample(T record) {
-        List<String> orders = new ArrayList<>();
-        orders.add("create_at desc");
-        return selectAllByExample(record, orders);
-    }
-
-
-    @Override
-    public Msg<PageResponse<T>> selectAllByExample(T record, List<?> orders) {
-        Msg<PageResponse<T>> msg = new Msg<>();
-        Msg<PageResponse<T>> pageListMsg = new Msg<>();
-        List<T> list = new ArrayList<>();
-        int limit = 5000;
-        PageBounds pageBounds = new PageBounds(1, limit);
-
-        pageBounds.setOrders(getOrder(orders));
-        boolean doLoop = true;
-        Pagination pagination = new Pagination();
-        while (Boolean.TRUE.equals(pageListMsg.isSuccess()) && doLoop) {
-            pageListMsg = selectByExampleByPager(record, pageBounds);
-            if (Boolean.TRUE.equals(pageListMsg.isSuccess())) {
-                doLoop = pageListMsg.getData().size() >= limit;
-                list.addAll(pageListMsg.getData());
-            }
-            pagination = pageListMsg.getData().getPagination();
-            pageBounds.setPage(pageBounds.getPage() + 1);
-        }
-
-        if (list.isEmpty()) {
-            msg.setResult(ErrorConstant.NO_MATCH, ErrorConstant.NO_MATCH_MSG);
-            return msg;
-        }
-        PageResponse<T> pageList = new PageResponse<>(list, pagination.getTotal(), 1);
-        msg.setData(pageList);
-        return msg;
+        return apiResponse;
     }
 
     private String getOrder(List<?> orders) {
@@ -114,106 +77,147 @@ public abstract class AbstractMybatisPageHelperServiceImpl<T extends BaseModelOb
     }
 
     @Override
-    public Msg<PageResponse<T>> selectByExampleByPager(T record, PageBounds pageBounds) {
-        Msg<PageResponse<T>> msg = new Msg<>();
-        PageHelper.startPage(pageBounds.getPage(), pageBounds.getLimit());
-        PageHelper.orderBy(pageBounds.getOrders());
+    public ApiResponse<PageResponse<T>> selectAllByExample(T example) {
+        List<String> orders = new ArrayList<>();
+        orders.add("create_at desc");
+        return selectAllByExample(example, orders);
+    }
 
-        Page<T> result = (Page<T>) getRepositoryDao().selectByExample(record, pageBounds);
+    @Override
+    public ApiResponse<PageResponse<T>> selectAllByExample(T example, List<?> orders) {
+        ApiResponse<PageResponse<T>> apiResponse = new ApiResponse<>();
+        ApiResponse<PageResponse<T>> pageListApiResponse = new ApiResponse<>();
+        List<T> list = new ArrayList<>();
+        int limit = 5000;
+        PageBounds pageBounds = new PageBounds(1, limit);
+
+        pageBounds.setOrders(getOrder(orders));
+        boolean doLoop = true;
+        Pagination pagination = new Pagination();
+        while (Boolean.TRUE.equals(pageListApiResponse.isSuccess()) && doLoop) {
+            if (isWithBlobs()) {
+                pageListApiResponse = selectByExampleWithBlobsByPager(example, pageBounds);
+            } else {
+                pageListApiResponse = selectByExampleByPager(example, pageBounds);
+            }
+            if (Boolean.TRUE.equals(pageListApiResponse.isSuccess())) {
+                doLoop = pageListApiResponse.getData().size() >= limit;
+                list.addAll(pageListApiResponse.getData());
+            }
+            pagination = pageListApiResponse.getData().getPagination();
+            pageBounds.setPage(pageBounds.getPage() + 1);
+        }
+
+        if (list.isEmpty()) {
+            apiResponse.setResult(ErrorCodeConstant.NO_MATCH, ErrorCodeConstant.NO_MATCH_MSG);
+            return apiResponse;
+        }
+        PageResponse<T> pageList = new PageResponse<>(list, pagination.getTotal(), 1);
+        apiResponse.setData(pageList);
+        return apiResponse;
+    }
+
+    @Override
+    public ApiResponse<PageResponse<T>> selectByExampleByPager(T example, PageBounds pageBounds) {
+        ApiResponse<PageResponse<T>> apiResponse = new ApiResponse<>();
+        PageHelper.orderBy(pageBounds.getOrders());
+        PageHelper.startPage(pageBounds.getPage(), pageBounds.getLimit());
+
+        Page<T> result = getRepositoryDao().selectByExample(example, pageBounds);
         if (result.isEmpty()) {
-            msg.setResult(ErrorConstant.NO_MATCH, ErrorConstant.NO_MATCH_MSG);
-            return msg;
+            apiResponse.setResult(ErrorCodeConstant.NO_MATCH, ErrorCodeConstant.NO_MATCH_MSG);
+            return apiResponse;
         }
 
         PageResponse<T> pageList = new PageResponse<>(result, pageBounds.getTotal(), pageBounds.getPage());
-        msg.setData(pageList);
-        return msg;
+        apiResponse.setData(pageList);
+        return apiResponse;
     }
 
     @Override
-    public Msg<T> selectOneByExample(T record) {
+    public ApiResponse<PageResponse<T>> selectByExampleWithBlobsByPager(T example, PageBounds pageBounds) {
+        ApiResponse<PageResponse<T>> apiResponse = new ApiResponse<>();
+        PageHelper.orderBy(pageBounds.getOrders());
+        PageHelper.startPage(pageBounds.getPage(), pageBounds.getLimit());
+
+        Page<T> result = getRepositoryDao().selectByExampleWithBLOBs(example, pageBounds);
+        if (result.isEmpty()) {
+            apiResponse.setResult(ErrorCodeConstant.NO_MATCH, ErrorCodeConstant.NO_MATCH_MSG);
+            return apiResponse;
+        }
+        PageResponse<T> pageList = new PageResponse<>(result, pageBounds.getTotal(), pageBounds.getPage());
+        apiResponse.setData(pageList);
+        return apiResponse;
+    }
+
+    @Override
+    public ApiResponse<T> selectOneByExample(T example) {
         List<?> orders = new ArrayList<>();
-        return selectOneByExample(record, orders);
+        return selectOneByExample(example, orders);
     }
 
     @Override
-    public Msg<T> selectOneByExample(T record, List<?> orders) {
-        Msg<T> msg = new Msg<>();
+    public ApiResponse<T> selectOneByExample(T example, List<?> orders) {
+        ApiResponse<T> apiResponse = new ApiResponse<>();
         Page<T> result;
         PageBounds pageBounds = new PageBounds(0, 2);
         pageBounds.setOrders(getOrder(orders));
 
         try {
-            result = (Page<T>) getRepositoryDao().selectByExampleWithBLOBs(record, pageBounds);
+            result = getRepositoryDao().selectByExampleWithBLOBs(example, pageBounds);
         } catch (Exception e) {
-            result = (Page<T>) getRepositoryDao().selectByExample(record, pageBounds);
+            result = getRepositoryDao().selectByExample(example, pageBounds);
         }
         if (null == result || result.isEmpty()) {
-            msg.setResult(ErrorConstant.NO_MATCH, ErrorConstant.NO_MATCH_MSG);
-            return msg;
+            apiResponse.setResult(ErrorCodeConstant.NO_MATCH, ErrorCodeConstant.NO_MATCH_MSG);
+            return apiResponse;
         }
 
         if (result.size() > 1) {
-            msg.setResult(ErrorConstant.CONFLICT, ErrorConstant.CONFLICT_MSG);
-            return msg;
+            apiResponse.setResult(ErrorCodeConstant.CONFLICT, ErrorCodeConstant.CONFLICT_MSG);
+            return apiResponse;
         }
 
-        msg.setData(result.get(0));
-        return msg;
+        apiResponse.setData(result.get(0));
+        return apiResponse;
     }
 
     @Override
-    public Msg<T> selectOneByExampleWithBlobs(T record, List<?> orders) {
-        Msg<T> msg = new Msg<>();
+    public ApiResponse<T> selectOneByExampleWithBlobs(T example, List<?> orders) {
+        ApiResponse<T> apiResponse = new ApiResponse<>();
 
         PageBounds pageBounds = new PageBounds(0, 2);
         pageBounds.setOrders(getOrder(orders));
 
-        Page<T> result = (Page<T>) getRepositoryDao().selectByExampleWithBLOBs(record, pageBounds);
+        Page<T> result = getRepositoryDao().selectByExampleWithBLOBs(example, pageBounds);
 
         if (CollectionUtils.isEmpty(result)) {
-            msg.setResult(ErrorConstant.NO_MATCH, ErrorConstant.NO_MATCH_MSG);
-            return msg;
+            apiResponse.setResult(ErrorCodeConstant.NO_MATCH, ErrorCodeConstant.NO_MATCH_MSG);
+            return apiResponse;
         }
 
         if (result.size() > 1) {
-            msg.setResult(ErrorConstant.CONFLICT, ErrorConstant.CONFLICT_MSG);
-            return msg;
+            apiResponse.setResult(ErrorCodeConstant.CONFLICT, ErrorCodeConstant.CONFLICT_MSG);
+            return apiResponse;
         }
 
-        msg.setData(result.get(0));
-        return msg;
+        apiResponse.setData(result.get(0));
+        return apiResponse;
     }
 
 
     @Override
-    public Msg<PageResponse<T>> selectByExampleWithBlobsByPager(T record, PageBounds pageBounds) {
-        Msg<PageResponse<T>> msg = new Msg<>();
-        PageHelper.startPage(pageBounds.getPage(), pageBounds.getLimit());
-        PageHelper.orderBy(pageBounds.getOrders());
-
-        Page<T> result = (Page<T>) getRepositoryDao().selectByExampleWithBLOBs(record, pageBounds);
-        if (result.isEmpty()) {
-            msg.setResult(ErrorConstant.NO_MATCH, ErrorConstant.NO_MATCH_MSG);
-            return msg;
-        }
-        PageResponse<T> pageList = new PageResponse<>(result, pageBounds.getTotal(), pageBounds.getPage());
-        msg.setData(pageList);
-        return msg;
-    }
-
-    @Override
-    public Msg<String> uniqueValid(T record) {
-        Msg<String> msg = new Msg<>();
-        Object key = record.valueOfKey();
+    public ApiResponse<String> uniqueValid(T record) {
+        ApiResponse<String> apiResponse = new ApiResponse<>();
+        Object key = record.getKey();
         if (null == key) {
             Long existNumber = getRepositoryDao().countByExample(record);
             if (existNumber > 0) {
-                msg.setResult(ErrorConstant.CONFLICT, ErrorConstant.CONFLICT_MSG);
-                return msg;
+                apiResponse.setResult(ErrorCodeConstant.CONFLICT, ErrorCodeConstant.CONFLICT_MSG);
+                return apiResponse;
             }
 
-            return msg;
+            return apiResponse;
         }
 
         /* 主键存在 参数获取的对象主键不一致时 返回错误 */
@@ -221,12 +225,12 @@ public abstract class AbstractMybatisPageHelperServiceImpl<T extends BaseModelOb
 
         PageBounds pageBounds = new PageBounds(0, 2);
 
-        Page<T> dbRecord = (Page<T>) getRepositoryDao().selectByExample(record, pageBounds);
-        if (null != dbRecord && !dbRecord.isEmpty() && !key.equals(dbRecord.get(0).valueOfKey())) {
-            msg.setResult(ErrorConstant.CONFLICT, ErrorConstant.CONFLICT_MSG);
-            return msg;
+        Page<T> dbRecord = getRepositoryDao().selectByExample(record, pageBounds);
+        if (null != dbRecord && !dbRecord.isEmpty() && !key.equals(dbRecord.get(0).getKey())) {
+            apiResponse.setResult(ErrorCodeConstant.CONFLICT, ErrorCodeConstant.CONFLICT_MSG);
+            return apiResponse;
         }
 
-        return msg;
+        return apiResponse;
     }
 }

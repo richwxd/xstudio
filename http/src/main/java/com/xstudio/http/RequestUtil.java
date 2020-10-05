@@ -1,8 +1,8 @@
 package com.xstudio.http;
 
-import com.alibaba.fastjson.JSON;
-import com.xstudio.core.ErrorConstant;
-import com.xstudio.core.Msg;
+import com.xstudio.core.ApiResponse;
+import com.xstudio.core.ErrorCodeConstant;
+import com.xstudio.core.JsonUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.apache.http.*;
@@ -16,7 +16,6 @@ import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.config.SocketConfig;
-import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.conn.routing.HttpRoute;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.LayeredConnectionSocketFactory;
@@ -39,7 +38,6 @@ import javax.net.ssl.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.lang.reflect.Type;
 import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
@@ -113,7 +111,7 @@ public class RequestUtil {
     /**
      * 日志
      */
-    private static Logger logger = LoggerFactory.getLogger(RequestUtil.class);
+    private static final Logger logger = LoggerFactory.getLogger(RequestUtil.class);
 
     /**
      * 获取HttpClient对象
@@ -214,11 +212,6 @@ public class RequestUtil {
             if (exception instanceof UnknownHostException) {
                 return false;
             }
-            // 连接被拒绝
-            if (exception instanceof ConnectTimeoutException) {
-                // 连接超时
-                return false;
-            }
             // SSL握手异常
             if (exception instanceof SSLException) {
                 return false;
@@ -227,11 +220,8 @@ public class RequestUtil {
             HttpClientContext clientContext = HttpClientContext.adapt(context);
             HttpRequest request = clientContext.getRequest();
             // 如果请求是幂等的，就再次尝试
-            if (!(request instanceof HttpEntityEnclosingRequest)) {
-                // 如果请求不是关闭连接的请求
-                return true;
-            }
-            return false;
+            // 如果请求不是关闭连接的请求
+            return !(request instanceof HttpEntityEnclosingRequest);
         };
 
         logger.info("{} {} 客户池状态：{}", hostname, port, connectionManager.getTotalStats());
@@ -301,7 +291,7 @@ public class RequestUtil {
      * @param response {@link HttpResponse}
      * @return 状态码
      */
-    public static int getStatus(HttpResponse response) {
+    public static int status(HttpResponse response) {
         return response.getStatusLine().getStatusCode();
     }
 
@@ -445,7 +435,7 @@ public class RequestUtil {
         PrintWriter out;
         try {
             out = response.getWriter();
-            out.println(JSON.toJSONString(object));
+            out.println(JsonUtil.toJsonString(object));
         } catch (IOException e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
@@ -622,7 +612,7 @@ public class RequestUtil {
      * @throws UnsupportedEncodingException {@link UnsupportedEncodingException}
      */
     public static String getCanonicalQueryString(Map<String, Object> params) throws UnsupportedEncodingException {
-        StringBuilder queryString = new StringBuilder("");
+        StringBuilder queryString = new StringBuilder();
         Set<Map.Entry<String, Object>> entries = params.entrySet();
         String value;
         for (Map.Entry<String, Object> entry : entries) {
@@ -639,7 +629,7 @@ public class RequestUtil {
             }
         }
 
-        return queryString.toString().substring(1);
+        return queryString.substring(1);
     }
 
     /**
@@ -649,30 +639,30 @@ public class RequestUtil {
      * @param url    地址
      * @param type   返回结果对象类型
      * @param <T>    返回结果对象类型
-     * @return {@link Msg}
+     * @return Msg
      */
-    public static <T> Msg<T> formPostProxy(Map<String, String> params, String url, Type type) {
-        Msg<T> msg = new Msg<>();
+    public static <T> ApiResponse<T> formPostProxy(Map<String, String> params, String url, Class<T> type) {
+        ApiResponse<T> apiResponse = new ApiResponse<>();
 
         ClientResponse clientResponse = RequestUtil.postForm(url, params);
 
         if (HttpStatus.SC_OK != clientResponse.getOrigin().getStatusLine().getStatusCode()) {
             logger.error("API服务调用异常 {} {}", clientResponse.getOrigin().getStatusLine().getStatusCode(), clientResponse.getContent());
-            msg.setResult(ErrorConstant.API_INVALID, ErrorConstant.API_INVALID_MSG);
-            msg.setMsg(String.valueOf(clientResponse.getOrigin().getStatusLine().getStatusCode()));
-            return msg;
+            apiResponse.setResult(ErrorCodeConstant.API_INVALID, ErrorCodeConstant.API_INVALID_MSG);
+            apiResponse.setMsg(String.valueOf(clientResponse.getOrigin().getStatusLine().getStatusCode()));
+            return apiResponse;
         }
 
-        msg = JSON.parseObject(clientResponse.getContent(), type);
-        if (0 != msg.getCode()) {
+        T data = JsonUtil.toObject(clientResponse.getContent(), type);
+        if (null == data) {
             logger.debug("API服务调用返回 {}", clientResponse.getContent());
-            msg.setMsg("服务异常[" + msg.getCode() + "]" + msg.getMsg());
-            msg.setCode(ErrorConstant.API_INVALID);
-            return msg;
+            apiResponse.setMsg("服务异常[" + apiResponse.getCode() + "]" + apiResponse.getMsg());
+            apiResponse.setCode(ErrorCodeConstant.API_INVALID);
+            return apiResponse;
         }
 
-        msg.setData(msg.getData());
-        return msg;
+        apiResponse.setData(apiResponse.getData());
+        return apiResponse;
     }
 
     /**
@@ -694,7 +684,7 @@ public class RequestUtil {
      * @param request 请求
      * @return Map
      */
-    public Map<String, String> getHeaders(HttpServletRequest request) {
+    public Map<String, String> headers(HttpServletRequest request) {
         Map<String, String> map = new HashMap<>();
         Enumeration<String> headerNames = request.getHeaderNames();
         while (headerNames.hasMoreElements()) {

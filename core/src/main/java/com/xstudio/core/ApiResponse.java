@@ -9,7 +9,7 @@ import java.util.List;
  * @author xiaobiao
  * @version 2020/2/2
  */
-public class Msg<T> implements Serializable {
+public class ApiResponse<T> implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
@@ -37,10 +37,10 @@ public class Msg<T> implements Serializable {
      */
     private List<String> msgs;
 
-    public Msg() {
+    public ApiResponse() {
     }
 
-    public Msg(int code, String msg) {
+    public ApiResponse(int code, String msg) {
         this.code = code;
         this.msg = msg;
     }

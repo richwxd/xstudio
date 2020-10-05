@@ -1,7 +1,5 @@
 package com.xstudio.spring.redis;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.support.spring.FastJsonRedisSerializer;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.slf4j.Logger;
@@ -12,6 +10,7 @@ import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettucePoolingClientConfiguration;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.util.CollectionUtils;
 
@@ -39,13 +38,12 @@ public class RedisConfigurationUtil {
         /* ========= 基本配置 ========= */
         // 独连模式
         if (null == redisProperties.getSentinel() && null == redisProperties.getCluster()) {
-            log.info("{} redis 使用独连模式配置", redisProperties.getName());
             configuration = new RedisStandaloneConfiguration(redisProperties.getHost(), redisProperties.getPort());
             ((RedisStandaloneConfiguration) configuration).setPassword(redisProperties.getPassword());
         }
 
         if (null != redisProperties.getSentinel() && null == redisProperties.getCluster()) {
-            log.info("{} redis 使用哨兵模式配置{} {}", redisProperties.getName(), redisProperties.getSentinel().getMaster(), JSON.toJSONString(redisProperties.getSentinel().getNodes()));
+            log.info("{} redis 使用哨兵模式配置{} ", redisProperties.getName(), redisProperties.getSentinel().getMaster());
             // 哨兵模式
             redisMode = RedisConfigurationMode.SENTINEL;
             List<String> sentinelNodes = redisProperties.getSentinel().getNodes();
@@ -161,8 +159,8 @@ public class RedisConfigurationUtil {
 //        ParserConfig.getGlobalInstance().addAccept("com.xstudio");
         redisTemplate.setEnableDefaultSerializer(false);
         // 设置值（value）的序列化采用FastJsonRedisSerializer。
-        redisTemplate.setValueSerializer(new FastJsonRedisSerializer<>(String.class));
-        redisTemplate.setHashValueSerializer(new FastJsonRedisSerializer<>(String.class));
+        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(Object.class));
+        redisTemplate.setHashValueSerializer(new Jackson2JsonRedisSerializer<>(Object.class));
 
         // 设置键（key）的序列化采用StringRedisSerializer。
         redisTemplate.setKeySerializer(new StringRedisSerializer());

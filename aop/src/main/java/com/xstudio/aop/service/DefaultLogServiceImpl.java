@@ -1,7 +1,7 @@
 package com.xstudio.aop.service;
 
-import com.alibaba.fastjson.JSON;
 import com.xstudio.aop.entity.LogEntity;
+import com.xstudio.core.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -16,6 +16,6 @@ public class DefaultLogServiceImpl implements ILogService {
 
     @Override
     public void doLog(LogEntity log) {
-        logger.info("{}", JSON.toJSONString(log));
+        logger.info("{}", JsonUtil.toJsonString(log));
     }
 }

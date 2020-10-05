@@ -1,9 +1,10 @@
 package com.xstudio.serializer;
 
-import com.alibaba.fastjson.serializer.JSONSerializer;
-import com.alibaba.fastjson.serializer.ObjectSerializer;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
 
-import java.lang.reflect.Type;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -17,7 +18,7 @@ import java.util.regex.Pattern;
  * @author xiaobiao
  * @version 2020/2/2
  */
-public class IdCardValueSerializer implements ObjectSerializer {
+public class IdCardValueSerializer extends JsonSerializer<String> {
     /**
      * 大部分敏感词汇在10个以内，直接返回缓存的字符串
      */
@@ -39,17 +40,17 @@ public class IdCardValueSerializer implements ObjectSerializer {
     private static final Pattern PATTERN = Pattern.compile(REGEX);
 
     @Override
-    public void write(JSONSerializer serializer, Object object, Object fieldName, Type fieldType, int features) {
-        Matcher matcher = PATTERN.matcher(String.valueOf(object));
+    public void serialize(String value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+        Matcher matcher = PATTERN.matcher(value);
         if (matcher.find()) {
             StringBuilder sb = new StringBuilder();
             sb.append(matcher.group(1));
             int length = matcher.group(2).length();
             sb.append(starArr.get(length));
             sb.append(matcher.group(3));
-            serializer.write(sb);
+            gen.writeString(sb.toString());
         } else {
-            serializer.write(object);
+            gen.writeString(value);
         }
     }
 }

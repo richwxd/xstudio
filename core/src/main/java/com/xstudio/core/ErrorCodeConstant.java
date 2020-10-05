@@ -1,12 +1,12 @@
 package com.xstudio.core;
 
 /**
- * error constant
+ * error code constant
  *
  * @author xiaobiao
  * @version 2020/2/2
  */
-public class ErrorConstant {
+public class ErrorCodeConstant {
     /**
      * 写入失败
      */

@@ -1,10 +1,10 @@
 package com.xstudio.serializer;
 
-import com.alibaba.fastjson.serializer.JSONSerializer;
-import com.alibaba.fastjson.serializer.ObjectSerializer;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 
 /**
  * 手机号加星序列化，对手机号中间4位进行加星操作<br>
@@ -13,12 +13,11 @@ import java.lang.reflect.Type;
  * @author xiaobiao
  * @version 2020/2/2
  */
-public class PhoneStarSerializer implements ObjectSerializer {
+public class PhoneStarSerializer extends JsonSerializer<String> {
 
     @Override
-    public void write(JSONSerializer serializer, Object object, Object fieldName, Type fieldType, int features) throws IOException {
-        String value = (String) object;
+    public void serialize(String value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
         String text = value.replaceAll("(\\d{3})\\d+(\\d{4})", "$1****$2");
-        serializer.write(text);
+        gen.writeString(text);
     }
 }

@@ -36,26 +36,56 @@ public class Pagination implements Serializable {
         this.current = current;
     }
 
+    /**
+     * get field 数据总数
+     *
+     * @return total 数据总数
+     */
     public Integer getTotal() {
-        return total;
+        return this.total;
     }
 
+    /**
+     * set field 数据总数
+     *
+     * @param total 数据总数
+     */
     public void setTotal(Integer total) {
         this.total = total;
     }
 
+    /**
+     * get field 当前页 从0开始计数
+     *
+     * @return current 当前页 从0开始计数
+     */
     public Integer getCurrent() {
-        return current;
+        return this.current;
     }
 
+    /**
+     * set field 当前页 从0开始计数
+     *
+     * @param current 当前页 从0开始计数
+     */
     public void setCurrent(Integer current) {
         this.current = current;
     }
 
+    /**
+     * get field 每页显示的数据条数
+     *
+     * @return pageSize 每页显示的数据条数
+     */
     public Integer getPageSize() {
-        return pageSize;
+        return this.pageSize;
     }
 
+    /**
+     * set field 每页显示的数据条数
+     *
+     * @param pageSize 每页显示的数据条数
+     */
     public void setPageSize(Integer pageSize) {
         this.pageSize = pageSize;
     }
