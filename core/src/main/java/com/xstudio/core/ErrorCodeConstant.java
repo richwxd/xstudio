@@ -1,6 +1,8 @@
 package com.xstudio.core;
 
 /**
+ * error constant
+ *
  * @author xiaobiao
  * @version 2020/2/2
  */
