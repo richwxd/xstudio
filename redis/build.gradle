@@ -1,4 +1,4 @@
-group 'com.xstudio.spring'
+group 'com.xstudio'
 version '1.0.0-SNAPSHOT'
 
 dependencies {

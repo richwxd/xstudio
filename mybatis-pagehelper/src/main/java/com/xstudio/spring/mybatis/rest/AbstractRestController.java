@@ -1,9 +1,9 @@
 package com.xstudio.spring.mybatis.rest;
 
 import com.xstudio.antdesign.TableResponse;
+import com.xstudio.core.ApiResponse;
 import com.xstudio.core.BaseModelObject;
 import com.xstudio.core.ErrorCodeConstant;
-import com.xstudio.core.ApiResponse;
 import com.xstudio.spring.mybatis.antdesign.PageRequest;
 import com.xstudio.spring.web.rest.AbstractBaseRestController;
 import org.apache.ibatis.session.RowBounds;

@@ -12,10 +12,12 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class DefaultLogServiceImpl implements ILogService {
-    public static Logger logger = LoggerFactory.getLogger(DefaultLogServiceImpl.class);
+    private static Logger logger = LoggerFactory.getLogger(DefaultLogServiceImpl.class);
 
     @Override
     public void doLog(LogEntity log) {
-        logger.info("{}", JsonUtil.toJsonString(log));
+        if (logger.isInfoEnabled()) {
+            logger.info("{}", JsonUtil.toJsonString(log));
+        }
     }
 }

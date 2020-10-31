@@ -24,12 +24,12 @@ public interface IAbstractDao<T, K, P, M extends List<T>> {
     int insertSelective(T record);
 
     /**
-     * 批量插入设置的值
+     * 批量插入
      *
      * @param record 对象
      * @return 插入成功数
      */
-    int batchInsertSelective(List<T> record);
+    int batchInsert(List<T> record);
 
     /**
      * 主键删除

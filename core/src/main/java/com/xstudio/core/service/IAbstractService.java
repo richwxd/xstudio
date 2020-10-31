@@ -10,30 +10,6 @@ import java.util.List;
  */
 public interface IAbstractService<T, K, P, L extends List<T>, D extends List<T>> {
     /**
-     * 统计总数
-     *
-     * @param example 统计条件
-     * @return 统计结果
-     */
-    Long countByExample(T example);
-
-    /**
-     * 主键删除
-     *
-     * @param keys 主键
-     * @return 删除条数
-     */
-    ApiResponse<Integer> deleteByPrimaryKey(K keys);
-
-    /**
-     * 按条件删除
-     *
-     * @param example 条件对象
-     * @return {@link Integer}
-     */
-    ApiResponse<Integer> deleteByExample(T example);
-
-    /**
      * 批量删除
      *
      * @param keys 主键
@@ -42,38 +18,12 @@ public interface IAbstractService<T, K, P, L extends List<T>, D extends List<T>>
     ApiResponse<Integer> batchDeleteByPrimaryKey(List<K> keys);
 
     /**
-     * 更新选定的值
+     * 批量插入
      *
      * @param record 对象
-     * @return 更新的条数
+     * @return 插入成功数
      */
-    ApiResponse<T> updateByPrimaryKeySelective(T record);
-
-    /**
-     * 按条件更新选定的值
-     *
-     * @param record  值对象
-     * @param example 条件
-     * @return 更新的条数
-     */
-    ApiResponse<T> updateByExampleSelective(T record, T example);
-
-    /**
-     * 全字段按条件更新
-     *
-     * @param record  赋值对象
-     * @param example 更新条件
-     * @return 对象
-     */
-    ApiResponse<T> updateByExample(T record, T example);
-
-    /**
-     * 全字段按主键更新
-     *
-     * @param record 赋值对象
-     * @return 对象
-     */
-    ApiResponse<T> updateByPrimaryKey(T record);
+    ApiResponse<L> batchInsert(L record);
 
     /**
      * 批量按主键更新设定的值
@@ -84,73 +34,28 @@ public interface IAbstractService<T, K, P, L extends List<T>, D extends List<T>>
     ApiResponse<L> batchUpdateByPrimaryKeySelective(L record);
 
     /**
-     * 按主键获取
+     * 统计总数
+     *
+     * @param example 统计条件
+     * @return 统计结果
+     */
+    Long countByExample(T example);
+
+    /**
+     * 按条件删除
+     *
+     * @param example 条件对象
+     * @return {@link Integer}
+     */
+    ApiResponse<Integer> deleteByExample(T example);
+
+    /**
+     * 主键删除
      *
      * @param keys 主键
-     * @return 对象
+     * @return 删除条数
      */
-    ApiResponse<T> selectByPrimaryKey(K keys);
-
-    /**
-     * 按条件获取（不含大字段）
-     *
-     * @param example 条件
-     * @param orders  排序
-     * @return 对象list
-     */
-    ApiResponse<T> selectOneByExample(T example, List<?> orders);
-
-    /**
-     * 按条件获取（不含大字段） distinct = true
-     *
-     * @param example 条件
-     * @return 对象list
-     */
-    ApiResponse<T> selectOneByExample(T example);
-
-    /**
-     * 按条件获取（含大字段）
-     *
-     * @param example 条件
-     * @param orders  排序
-     * @return 对象list
-     */
-    ApiResponse<T> selectOneByExampleWithBlobs(T example, List<?> orders);
-
-    /**
-     * 分页获取
-     *
-     * @param example    条件
-     * @param pageBounds 分页参数
-     * @return 对象list
-     */
-    ApiResponse<L> selectByExampleByPager(T example, P pageBounds);
-
-    /**
-     * 分页获取(含大字段）
-     *
-     * @param example    条件
-     * @param pageBounds 分页参数
-     * @return 对象list
-     */
-    ApiResponse<L> selectByExampleWithBlobsByPager(T example, P pageBounds);
-
-    /**
-     * 按条件获取（含大字段）
-     *
-     * @param example 条件
-     * @return 对象list
-     */
-    ApiResponse<L> selectAllByExample(T example);
-
-    /**
-     * 按条件获取（含大字段），指定排序
-     *
-     * @param example 条件
-     * @param orders  排序
-     * @return 对象list
-     */
-    ApiResponse<L> selectAllByExample(T example, List<?> orders);
+    ApiResponse<Integer> deleteByPrimaryKey(K keys);
 
     /**
      * 模糊搜索
@@ -193,12 +98,73 @@ public interface IAbstractService<T, K, P, L extends List<T>, D extends List<T>>
     ApiResponse<T> insertSelective(T record);
 
     /**
-     * 批量插入设置的值
+     * 按条件获取（含大字段）
      *
-     * @param record 对象
-     * @return 插入成功数
+     * @param example 条件
+     * @return 对象list
      */
-    ApiResponse<L> batchInsertSelective(L record);
+    ApiResponse<L> selectAllByExample(T example);
+
+    /**
+     * 按条件获取（含大字段），指定排序
+     *
+     * @param example 条件
+     * @param orders  排序
+     * @return 对象list
+     */
+    ApiResponse<L> selectAllByExample(T example, List<?> orders);
+
+    /**
+     * 分页获取
+     *
+     * @param example    条件
+     * @param pageBounds 分页参数
+     * @return 对象list
+     */
+    ApiResponse<L> selectByExampleByPager(T example, P pageBounds);
+
+    /**
+     * 分页获取(含大字段）
+     *
+     * @param example    条件
+     * @param pageBounds 分页参数
+     * @return 对象list
+     */
+    ApiResponse<L> selectByExampleWithBlobsByPager(T example, P pageBounds);
+
+    /**
+     * 按主键获取
+     *
+     * @param keys 主键
+     * @return 对象
+     */
+    ApiResponse<T> selectByPrimaryKey(K keys);
+
+    /**
+     * 按条件获取（不含大字段）
+     *
+     * @param example 条件
+     * @param orders  排序
+     * @return 对象list
+     */
+    ApiResponse<T> selectOneByExample(T example, List<?> orders);
+
+    /**
+     * 按条件获取（不含大字段） distinct = true
+     *
+     * @param example 条件
+     * @return 对象list
+     */
+    ApiResponse<T> selectOneByExample(T example);
+
+    /**
+     * 按条件获取（含大字段）
+     *
+     * @param example 条件
+     * @param orders  排序
+     * @return 对象list
+     */
+    ApiResponse<T> selectOneByExampleWithBlobs(T example, List<?> orders);
 
     /**
      * 唯一验证
@@ -207,5 +173,39 @@ public interface IAbstractService<T, K, P, L extends List<T>, D extends List<T>>
      * @return 验证结果 msg.code == 0 时表示该字段可用
      */
     ApiResponse<String> uniqueValid(T record);
+
+    /**
+     * 全字段按条件更新
+     *
+     * @param record  赋值对象
+     * @param example 更新条件
+     * @return 对象
+     */
+    ApiResponse<T> updateByExample(T record, T example);
+
+    /**
+     * 按条件更新选定的值
+     *
+     * @param record  值对象
+     * @param example 条件
+     * @return 更新的条数
+     */
+    ApiResponse<T> updateByExampleSelective(T record, T example);
+
+    /**
+     * 全字段按主键更新
+     *
+     * @param record 赋值对象
+     * @return 对象
+     */
+    ApiResponse<T> updateByPrimaryKey(T record);
+
+    /**
+     * 更新选定的值
+     *
+     * @param record 对象
+     * @return 更新的条数
+     */
+    ApiResponse<T> updateByPrimaryKeySelective(T record);
 }
 

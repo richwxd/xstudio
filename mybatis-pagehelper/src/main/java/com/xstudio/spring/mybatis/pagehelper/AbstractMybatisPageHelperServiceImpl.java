@@ -7,7 +7,6 @@ import com.xstudio.core.ApiResponse;
 import com.xstudio.core.BaseModelObject;
 import com.xstudio.core.ErrorCodeConstant;
 import com.xstudio.core.service.AbstractServiceImpl;
-import com.xstudio.core.service.IAbstractDao;
 import com.xstudio.spring.mybatis.antdesign.PageResponse;
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -53,6 +52,7 @@ public abstract class AbstractMybatisPageHelperServiceImpl<T extends BaseModelOb
     @Override
     public ApiResponse<PageResponse<T>> fuzzySearchByPager(T example, PageBounds pageBounds) {
         ApiResponse<PageResponse<T>> apiResponse = new ApiResponse<>();
+
         PageHelper.orderBy(pageBounds.getOrders());
         PageHelper.startPage(pageBounds.getPage(), pageBounds.getLimit());
         Page<T> result = getRepositoryDao().fuzzySearch(example);
@@ -66,6 +66,13 @@ public abstract class AbstractMybatisPageHelperServiceImpl<T extends BaseModelOb
         return apiResponse;
     }
 
+    @Override
+    public ApiResponse<PageResponse<T>> selectAllByExample(T example) {
+        List<String> orders = new ArrayList<>();
+        orders.add("create_at desc");
+        return selectAllByExample(example, orders);
+    }
+
     private String getOrder(List<?> orders) {
         StringBuilder sb = new StringBuilder();
         for (Object order : orders) {
@@ -74,13 +81,6 @@ public abstract class AbstractMybatisPageHelperServiceImpl<T extends BaseModelOb
         }
         sb.reverse();
         return sb.toString();
-    }
-
-    @Override
-    public ApiResponse<PageResponse<T>> selectAllByExample(T example) {
-        List<String> orders = new ArrayList<>();
-        orders.add("create_at desc");
-        return selectAllByExample(example, orders);
     }
 
     @Override
@@ -137,9 +137,9 @@ public abstract class AbstractMybatisPageHelperServiceImpl<T extends BaseModelOb
     @Override
     public ApiResponse<PageResponse<T>> selectByExampleWithBlobsByPager(T example, PageBounds pageBounds) {
         ApiResponse<PageResponse<T>> apiResponse = new ApiResponse<>();
+
         PageHelper.orderBy(pageBounds.getOrders());
         PageHelper.startPage(pageBounds.getPage(), pageBounds.getLimit());
-
         Page<T> result = getRepositoryDao().selectByExampleWithBLOBs(example, pageBounds);
         if (result.isEmpty()) {
             apiResponse.setResult(ErrorCodeConstant.NO_MATCH, ErrorCodeConstant.NO_MATCH_MSG);
@@ -148,12 +148,6 @@ public abstract class AbstractMybatisPageHelperServiceImpl<T extends BaseModelOb
         PageResponse<T> pageList = new PageResponse<>(result, pageBounds.getTotal(), pageBounds.getPage());
         apiResponse.setData(pageList);
         return apiResponse;
-    }
-
-    @Override
-    public ApiResponse<T> selectOneByExample(T example) {
-        List<?> orders = new ArrayList<>();
-        return selectOneByExample(example, orders);
     }
 
     @Override
@@ -180,6 +174,12 @@ public abstract class AbstractMybatisPageHelperServiceImpl<T extends BaseModelOb
 
         apiResponse.setData(result.get(0));
         return apiResponse;
+    }
+
+    @Override
+    public ApiResponse<T> selectOneByExample(T example) {
+        List<?> orders = new ArrayList<>();
+        return selectOneByExample(example, orders);
     }
 
     @Override

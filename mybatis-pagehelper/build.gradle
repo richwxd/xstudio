@@ -1,11 +1,11 @@
-group 'com.xstudio.spring'
+group 'com.xstudio'
 version '1.0.0-SNAPSHOT'
 
 dependencies {
     compile project(":antdesign")
     compile project(":mybatis")
     compile project(":core")
-    compile project(":web")
+    compile project(":spring-web")
 
     compile('org.mybatis.spring.boot:mybatis-spring-boot-starter:2.0.1')
     compile("org.mybatis:mybatis:3.5.1")

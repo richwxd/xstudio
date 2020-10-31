@@ -89,7 +89,7 @@ subprojects {
                 url = uri("https://maven.pkg.github.com/xbeeant/xstudio")
                 credentials {
                     username = "huangxb0512@gmail.com"
-                    password = ""
+                    password = System.getenv("token")
                 }
             }
         }
@@ -115,9 +115,9 @@ subprojects {
                         }
                     }
                     scm {
-                        connection = "https://maven.pkg.github.com/xbeeant/xstudio"
-                        developerConnection = "https://maven.pkg.github.com/xbeeant/xstudio"
-                        url = "https://maven.pkg.github.com/xbeeant/xstudio"
+                        connection = "https://github.com/xbeeant/xstudio"
+                        developerConnection = "https://github.com/xbeeant/xstudio"
+                        url = "https://github.com/xbeeant/xstudio/packages"
                     }
                 }
             }
