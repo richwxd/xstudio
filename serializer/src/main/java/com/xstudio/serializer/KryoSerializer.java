@@ -21,12 +21,13 @@ public class KryoSerializer {
      * 反序列化
      *
      * @param dataStream 数据流
-     * @return {@link O}
+     * @param <T>        泛型
+     * @return T
      */
     @SuppressWarnings("unchecked")
-    public static <O> O deserialize(final byte[] dataStream) {
+    public static <T> T deserialize(final byte[] dataStream) {
         Kryo kryoPoolElement = pool.obtain();
-        O deserializedObject = (O) kryoPoolElement.readClassAndObject(new Input(dataStream));
+        T deserializedObject = (T) kryoPoolElement.readClassAndObject(new Input(dataStream));
         pool.free(kryoPoolElement);
         return deserializedObject;
     }

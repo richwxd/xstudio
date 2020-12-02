@@ -29,7 +29,8 @@ public class RedisConfigurationUtil {
      * 获得redisTemplate
      *
      * @param redisProperties 复述,属性
-     * @return {@link RedisTemplate&lt;Object, Object&gt;}
+     * @return RedisTemplate
+     * @see RedisTemplate
      */
     public static RedisTemplate<Object, Object> getRedisTemplate(BasicRedisProperties redisProperties) {
         RedisConfiguration configuration = null;
@@ -114,7 +115,8 @@ public class RedisConfigurationUtil {
      * @param configuration           配置
      * @param genericObjectPoolConfig 通用对象池配置
      * @param lettuce                 生菜
-     * @return {@link RedisTemplate&lt;Object, Object&gt;}
+     * @return RedisTemplate
+     * @see RedisTemplate
      */
     private static RedisTemplate<Object, Object> lettucePool(BasicRedisProperties redisProperties, RedisConfiguration configuration, GenericObjectPoolConfig<?> genericObjectPoolConfig, BasicRedisProperties.Lettuce lettuce) {
         RedisConnectionFactory connectionFactory;
@@ -145,7 +147,7 @@ public class RedisConfigurationUtil {
      * @param redisMode               复述,模式
      * @param genericObjectPoolConfig 通用对象池配置
      * @param jedis                   能
-     * @return {@link RedisTemplate&lt;Object, Object&gt;}
+     * @return RedisTemplate&lt;Object, Object&gt;
      */
     private static RedisTemplate<Object, Object> jedisPool(BasicRedisProperties redisProperties, RedisConfiguration configuration, String redisMode, GenericObjectPoolConfig<?> genericObjectPoolConfig, BasicRedisProperties.Jedis jedis) {
         RedisConnectionFactory connectionFactory;
@@ -181,7 +183,7 @@ public class RedisConfigurationUtil {
      * 该方法不能加 @Bean 否则不管如何调用，connectionFactory都会是默认配置
      *
      * @param redisConnectionFactory {@link RedisConnectionFactory}
-     * @return {@link RedisTemplate}
+     * @return RedisTemplate
      */
     public static RedisTemplate<Object, Object> createRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<Object, Object> redisTemplate = new RedisTemplate<>();

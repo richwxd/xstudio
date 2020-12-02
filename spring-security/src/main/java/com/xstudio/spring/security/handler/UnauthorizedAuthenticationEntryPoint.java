@@ -12,7 +12,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * 用来解决匿名用户访问无权限资源时的异常<br />
+ * 用来解决匿名用户访问无权限资源时的异常
+ * <p>
  * 区别于 AccessDeineHandler 用来解决认证过的用户访问无权限资源时的异常
  *
  * @author xiaobiao

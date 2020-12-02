@@ -218,7 +218,7 @@ public class LoginParamters {
     /**
      * set field
      *
-     * @param remember
+     * @param remember 记住登录
      */
     public void setRemember(boolean remember) {
         this.remember = remember;
@@ -227,7 +227,7 @@ public class LoginParamters {
     /**
      * set field session
      *
-     * @param sessions session
+     * @param sessions session 会话信息
      */
     public void setSessions(HashMap<String, Object> sessions) {
         this.sessions = sessions;
@@ -236,7 +236,7 @@ public class LoginParamters {
     /**
      * set field userAgent
      *
-     * @param userAgent userAgent
+     * @param userAgent userAgent user-agent
      */
     public void setUserAgent(String userAgent) {
         this.userAgent = userAgent;
