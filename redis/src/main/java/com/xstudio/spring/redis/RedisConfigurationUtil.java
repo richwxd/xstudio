@@ -10,7 +10,6 @@ import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettucePoolingClientConfiguration;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.util.CollectionUtils;
 
@@ -26,6 +25,12 @@ import java.util.List;
 public class RedisConfigurationUtil {
     private static final Logger log = LoggerFactory.getLogger(RedisConfigurationUtil.class);
 
+    /**
+     * 获得redisTemplate
+     *
+     * @param redisProperties 复述,属性
+     * @return {@link RedisTemplate&lt;Object, Object&gt;}
+     */
     public static RedisTemplate<Object, Object> getRedisTemplate(BasicRedisProperties redisProperties) {
         RedisConfiguration configuration = null;
         RedisConnectionFactory connectionFactory;
@@ -91,58 +96,87 @@ public class RedisConfigurationUtil {
         GenericObjectPoolConfig<?> genericObjectPoolConfig = new GenericObjectPoolConfig<>();
         BasicRedisProperties.Lettuce lettuce = redisProperties.getLettuce();
         if (null != lettuce.getPool()) {
-            genericObjectPoolConfig.setMaxTotal(lettuce.getPool().getMaxActive());
-            genericObjectPoolConfig.setMinIdle(lettuce.getPool().getMinIdle());
-            genericObjectPoolConfig.setMaxIdle(lettuce.getPool().getMaxIdle());
-            genericObjectPoolConfig.setMaxWaitMillis(lettuce.getPool().getMaxWait().toMillis());
-
-            /* ========= lettuce pool ========= */
-            LettucePoolingClientConfiguration.LettucePoolingClientConfigurationBuilder builder = LettucePoolingClientConfiguration.builder();
-            builder.poolConfig(genericObjectPoolConfig);
-            if (null != redisProperties.getTimeout()) {
-                builder.commandTimeout(redisProperties.getTimeout());
-            }
-
-            connectionFactory = new LettuceConnectionFactory(configuration, builder.build());
-            ((LettuceConnectionFactory) connectionFactory).afterPropertiesSet();
-            /* ========= 创建 template ========= */
-            log.info("{} 使用 lettuce 连接池 {}", redisProperties.getName(), configuration.getClass().getName());
-            return createRedisTemplate(connectionFactory);
+            return lettucePool(redisProperties, configuration, genericObjectPoolConfig, lettuce);
         }
 
         BasicRedisProperties.Jedis jedis = redisProperties.getJedis();
         if (null != jedis.getPool()) {
-            genericObjectPoolConfig.setMaxTotal(jedis.getPool().getMaxActive());
-            genericObjectPoolConfig.setMinIdle(jedis.getPool().getMinIdle());
-            genericObjectPoolConfig.setMaxIdle(jedis.getPool().getMaxIdle());
-            genericObjectPoolConfig.setMaxWaitMillis(jedis.getPool().getMaxWait().toMillis());
-
-            /* ========= jedis pool ========= */
-            JedisClientConfiguration.JedisPoolingClientConfigurationBuilder builder = (JedisClientConfiguration.JedisPoolingClientConfigurationBuilder) JedisClientConfiguration.builder();
-            builder.poolConfig(genericObjectPoolConfig);
-            assert configuration != null;
-            switch (redisMode) {
-                case "CLUSTER":
-                    connectionFactory = new JedisConnectionFactory((RedisClusterConfiguration) configuration, builder.build());
-                    break;
-                case "SENTINEL":
-                    connectionFactory = new JedisConnectionFactory((RedisSentinelConfiguration) configuration, builder.build());
-                    break;
-                default:
-                    connectionFactory = new JedisConnectionFactory((RedisStandaloneConfiguration) configuration, builder.build());
-            }
-            ((JedisConnectionFactory) connectionFactory).afterPropertiesSet();
-
-            log.info("{} redis 使用jedis 连接池", redisProperties.getName());
-            /* ========= 创建 template ========= */
-            return createRedisTemplate(connectionFactory);
+            return jedisPool(redisProperties, configuration, redisMode, genericObjectPoolConfig, jedis);
         }
 
         return null;
     }
 
     /**
-     * json 实现 redisTemplate
+     * lettuce redis pool
+     *
+     * @param redisProperties         复述,属性
+     * @param configuration           配置
+     * @param genericObjectPoolConfig 通用对象池配置
+     * @param lettuce                 生菜
+     * @return {@link RedisTemplate&lt;Object, Object&gt;}
+     */
+    private static RedisTemplate<Object, Object> lettucePool(BasicRedisProperties redisProperties, RedisConfiguration configuration, GenericObjectPoolConfig<?> genericObjectPoolConfig, BasicRedisProperties.Lettuce lettuce) {
+        RedisConnectionFactory connectionFactory;
+        genericObjectPoolConfig.setMaxTotal(lettuce.getPool().getMaxActive());
+        genericObjectPoolConfig.setMinIdle(lettuce.getPool().getMinIdle());
+        genericObjectPoolConfig.setMaxIdle(lettuce.getPool().getMaxIdle());
+        genericObjectPoolConfig.setMaxWaitMillis(lettuce.getPool().getMaxWait().toMillis());
+
+        /* ========= lettuce pool ========= */
+        LettucePoolingClientConfiguration.LettucePoolingClientConfigurationBuilder builder = LettucePoolingClientConfiguration.builder();
+        builder.poolConfig(genericObjectPoolConfig);
+        if (null != redisProperties.getTimeout()) {
+            builder.commandTimeout(redisProperties.getTimeout());
+        }
+
+        connectionFactory = new LettuceConnectionFactory(configuration, builder.build());
+        ((LettuceConnectionFactory) connectionFactory).afterPropertiesSet();
+        /* ========= 创建 template ========= */
+        log.info("{} 使用 lettuce 连接池 {}", redisProperties.getName(), configuration.getClass().getName());
+        return createRedisTemplate(connectionFactory);
+    }
+
+    /**
+     * jedis pool
+     *
+     * @param redisProperties         复述,属性
+     * @param configuration           配置
+     * @param redisMode               复述,模式
+     * @param genericObjectPoolConfig 通用对象池配置
+     * @param jedis                   能
+     * @return {@link RedisTemplate&lt;Object, Object&gt;}
+     */
+    private static RedisTemplate<Object, Object> jedisPool(BasicRedisProperties redisProperties, RedisConfiguration configuration, String redisMode, GenericObjectPoolConfig<?> genericObjectPoolConfig, BasicRedisProperties.Jedis jedis) {
+        RedisConnectionFactory connectionFactory;
+        genericObjectPoolConfig.setMaxTotal(jedis.getPool().getMaxActive());
+        genericObjectPoolConfig.setMinIdle(jedis.getPool().getMinIdle());
+        genericObjectPoolConfig.setMaxIdle(jedis.getPool().getMaxIdle());
+        genericObjectPoolConfig.setMaxWaitMillis(jedis.getPool().getMaxWait().toMillis());
+
+        /* ========= jedis pool ========= */
+        JedisClientConfiguration.JedisPoolingClientConfigurationBuilder builder = (JedisClientConfiguration.JedisPoolingClientConfigurationBuilder) JedisClientConfiguration.builder();
+        builder.poolConfig(genericObjectPoolConfig);
+        assert configuration != null;
+        switch (redisMode) {
+            case "CLUSTER":
+                connectionFactory = new JedisConnectionFactory((RedisClusterConfiguration) configuration, builder.build());
+                break;
+            case "SENTINEL":
+                connectionFactory = new JedisConnectionFactory((RedisSentinelConfiguration) configuration, builder.build());
+                break;
+            default:
+                connectionFactory = new JedisConnectionFactory((RedisStandaloneConfiguration) configuration, builder.build());
+        }
+        ((JedisConnectionFactory) connectionFactory).afterPropertiesSet();
+
+        log.info("{} redis 使用jedis 连接池", redisProperties.getName());
+        /* ========= 创建 template ========= */
+        return createRedisTemplate(connectionFactory);
+    }
+
+    /**
+     * redisTemplate
      * <p>
      * 该方法不能加 @Bean 否则不管如何调用，connectionFactory都会是默认配置
      *
@@ -153,16 +187,12 @@ public class RedisConfigurationUtil {
         RedisTemplate<Object, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory);
 
-        // 全局开启AutoType，不建议使用
-        // ParserConfig.getGlobalInstance().setAutoTypeSupport(true);
-        // 建议使用这种方式，小范围指定白名单
-//        ParserConfig.getGlobalInstance().addAccept("com.xstudio");
         redisTemplate.setEnableDefaultSerializer(false);
-        // 设置值（value）的序列化采用FastJsonRedisSerializer。
-        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(Object.class));
-        redisTemplate.setHashValueSerializer(new Jackson2JsonRedisSerializer<>(Object.class));
+        // 设置值（value）的序列化
+        redisTemplate.setValueSerializer(new KryoSerializerAdapter<>());
+        redisTemplate.setHashValueSerializer(new KryoSerializerAdapter<>());
 
-        // 设置键（key）的序列化采用StringRedisSerializer。
+        // 设置键（key）的序列化
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setHashKeySerializer(new StringRedisSerializer());
 

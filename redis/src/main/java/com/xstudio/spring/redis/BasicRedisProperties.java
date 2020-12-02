@@ -45,12 +45,24 @@ public class BasicRedisProperties {
      */
     private Duration timeout;
 
+    /**
+     * 哨兵
+     */
     private BasicRedisProperties.Sentinel sentinel;
 
+    /**
+     * 集群
+     */
     private BasicRedisProperties.Cluster cluster;
 
+    /**
+     * jedis
+     */
     private final BasicRedisProperties.Jedis jedis = new BasicRedisProperties.Jedis();
 
+    /**
+     * lettuce
+     */
     private final BasicRedisProperties.Lettuce lettuce = new BasicRedisProperties.Lettuce();
 
     /**

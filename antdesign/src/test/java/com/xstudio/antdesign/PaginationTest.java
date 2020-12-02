@@ -5,12 +5,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
- * @author Beeant
+ * @author xiaobiao
  * @version 2020/6/12
  */
 class PaginationTest {
 
-    private Pagination pagination = new Pagination();
+    private final Pagination pagination = new Pagination();
 
     @BeforeEach
     void setUp() {
