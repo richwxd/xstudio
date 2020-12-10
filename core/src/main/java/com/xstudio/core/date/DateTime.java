@@ -34,4 +34,8 @@ public class DateTime extends Date {
     public void setEnd(Date end) {
         this.end = end;
     }
+
+    public Date plus(int day) {
+        return new Date();
+    }
 }

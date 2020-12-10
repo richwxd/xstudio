@@ -1,9 +1,9 @@
 package com.xstudio.core;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.xstudio.core.date.DateTime;
+import com.google.gson.annotations.Expose;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 基础model对象
@@ -16,37 +16,39 @@ public abstract class BaseModelObject<K> implements Serializable {
     /**
      * 创建时间
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private DateTime createAt;
-
+    private Date createAt;
+    /**
+     * 创建开始时间
+     */
+    @Expose(serialize = false)
+    private Date createAtBegin;
+    /**
+     * 结束开始时间
+     */
+    @Expose(serialize = false)
+    private Date createAtEnd;
     /**
      * 创建人ID
      */
     private String createBy;
-
     /**
      * 更新时间
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private DateTime updateAt;
-
+    private Date updateAt;
+    /**
+     * 更新开始时间
+     */
+    @Expose(serialize = false)
+    private Date updateAtBegin;
+    /**
+     * 更新结束时间
+     */
+    @Expose(serialize = false)
+    private Date updateAtEnd;
     /**
      * 更新人ID
      */
     private String updateBy;
-
-
-    public K getKey() {
-        return valueOfKey();
-    }
-
-    /**
-     * 获取主键
-     *
-     * @return K
-     */
-    public abstract K valueOfKey();
-
 
     /**
      * 设置主键值
@@ -70,11 +72,11 @@ public abstract class BaseModelObject<K> implements Serializable {
         setUpdateAt(null);
     }
 
-    public DateTime getCreateAt() {
+    public Date getCreateAt() {
         return createAt;
     }
 
-    public void setCreateAt(DateTime createAt) {
+    public void setCreateAt(Date createAt) {
         this.createAt = createAt;
     }
 
@@ -86,11 +88,22 @@ public abstract class BaseModelObject<K> implements Serializable {
         this.createBy = createBy;
     }
 
-    public DateTime getUpdateAt() {
+    public K getKey() {
+        return valueOfKey();
+    }
+
+    /**
+     * 获取主键
+     *
+     * @return K
+     */
+    public abstract K valueOfKey();
+
+    public Date getUpdateAt() {
         return updateAt;
     }
 
-    public void setUpdateAt(DateTime updateAt) {
+    public void setUpdateAt(Date updateAt) {
         this.updateAt = updateAt;
     }
 

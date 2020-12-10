@@ -1,6 +1,7 @@
 package com.xstudio.crypto.asymmetric;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -18,7 +19,7 @@ import java.util.Base64;
  */
 class RSAUtilTest {
     @Test
-    public void test() throws Exception {
+    void test() throws Exception {
 
 
         // generate public and private keys
@@ -30,6 +31,7 @@ class RSAUtilTest {
         byte[] encrypted = RSAUtil.encrypt(privateKey, "This is a secret message");
         // decrypt the message
         byte[] secret = RSAUtil.decrypt(publicKey, encrypted);
+        Assertions.assertNotNull(publicKey);
     }
 
     private void mybatis(String var0, String var1, String var2) throws Exception {

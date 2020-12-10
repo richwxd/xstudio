@@ -1,13 +1,18 @@
 package com.xstudio.core.date;
 
+import org.junit.jupiter.api.Test;
+
+import java.util.Date;
+
 /**
  * @author xiaobiao
  * @version 2020/2/2
  */
-public class DateTimeTest {
-
-    public void testDateTime() {
+class DateTimeTest {
+    @Test
+    void testDateTime() {
         DateTime dateTime = new DateTime();
-
+        dateTime.setStart(new Date());
+        dateTime.setEnd(new Date());
     }
 }

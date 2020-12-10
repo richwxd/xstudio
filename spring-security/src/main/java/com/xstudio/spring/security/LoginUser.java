@@ -13,30 +13,30 @@ import java.util.Set;
  * @version 1.0.0
  * @date 2020/12/01
  */
-public class UserDetails extends User {
+public class LoginUser<T> extends User {
 
     /**
      * 权限
      */
     private Set<GrantedAuthority> authorities;
     /**
-     * 用户详细信息
-     */
-    private Object details;
-    /**
      * 第三方token
      */
     private String token;
+    /**
+     * 用户详细信息
+     */
+    private T details;
     /**
      * 用户ID
      */
     private String userId;
 
-    public UserDetails(String username, String password, Collection<? extends GrantedAuthority> authorities) {
+    public LoginUser(String username, String password, Collection<? extends GrantedAuthority> authorities) {
         super(username, password, authorities);
     }
 
-    public UserDetails(String username, String password, boolean enabled, boolean accountNonExpired, boolean credentialsNonExpired, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities) {
+    public LoginUser(String username, String password, boolean enabled, boolean accountNonExpired, boolean credentialsNonExpired, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities) {
         super(username, password, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, authorities);
     }
 
@@ -49,12 +49,14 @@ public class UserDetails extends User {
         this.authorities = authorities;
     }
 
-    public Object getDetails() {
-        return details;
+    @Override
+    public boolean equals(Object rhs) {
+        return super.equals(rhs);
     }
 
-    public void setDetails(Object details) {
-        this.details = details;
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 
     public String getToken() {
@@ -63,6 +65,14 @@ public class UserDetails extends User {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public T getDetails() {
+        return details;
+    }
+
+    public void setDetails(T details) {
+        this.details = details;
     }
 
     public String getUserId() {

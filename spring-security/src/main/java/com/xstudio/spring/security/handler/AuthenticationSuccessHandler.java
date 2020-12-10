@@ -2,7 +2,7 @@ package com.xstudio.spring.security.handler;
 
 import com.xstudio.core.ApiResponse;
 import com.xstudio.http.RequestUtil;
-import com.xstudio.spring.security.UserDetails;
+import com.xstudio.spring.security.LoginUser;
 import org.apache.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
@@ -32,9 +32,9 @@ public class AuthenticationSuccessHandler extends SavedRequestAwareAuthenticatio
     }
 
     public Object setData(Authentication authentication) {
-        if (authentication.getPrincipal() instanceof UserDetails) {
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            return userDetails.getDetails();
+        if (authentication.getPrincipal() instanceof LoginUser) {
+            LoginUser loginUser = (LoginUser) authentication.getPrincipal();
+            return loginUser.getDetails();
         }
 
         return null;

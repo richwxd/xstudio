@@ -1,17 +1,15 @@
 package com.xstudio.spring.security.filter;
 
 import com.xstudio.spring.security.LoginParamters;
-import com.xstudio.spring.security.exception.InvalidAuthCodeException;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 /**
  * 支持更多登录参数
@@ -24,29 +22,16 @@ public class MoreParameterAuthenticationFilter extends AbstractAuthenticationPro
     /**
      * 用户名参数
      */
-    private static String USERNAME_PARAM = "username";
+    private static String username = "username";
 
     /**
      * 密码参数
      */
-    private static String PASSWORD_PARAM = "password";
+    private static String password = "password";
 
-    /**
-     * 用户名设置参数
-     *
-     * @param usernameParam 用户参数
-     */
-    public static void setUsernameParam(String usernameParam) {
-        USERNAME_PARAM = usernameParam;
-    }
-
-    /**
-     * 参数设置密码
-     *
-     * @param passwordParam 密码参数
-     */
-    public static void setPasswordParam(String passwordParam) {
-        PASSWORD_PARAM = passwordParam;
+    public MoreParameterAuthenticationFilter(AuthenticationManager authenticationManager, String pattern) {
+        super(new AntPathRequestMatcher(pattern));
+        this.setAuthenticationManager(authenticationManager);
     }
 
     protected MoreParameterAuthenticationFilter(String defaultFilterProcessesUrl) {
@@ -57,13 +42,31 @@ public class MoreParameterAuthenticationFilter extends AbstractAuthenticationPro
         super(requiresAuthenticationRequestMatcher);
     }
 
-    @Override
-    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
-        LoginParamters loginParams = new LoginParamters(request);
-        Object username = loginParams.get(USERNAME_PARAM);
-        Object password = loginParams.get(PASSWORD_PARAM);
+    /**
+     * 参数设置密码
+     *
+     * @param password 密码参数
+     */
+    public static void setPassword(String password) {
+        MoreParameterAuthenticationFilter.password = password;
+    }
 
-        UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(username, password);
+    /**
+     * 用户名设置参数
+     *
+     * @param username 用户参数
+     */
+    public static void setUsername(String username) {
+        MoreParameterAuthenticationFilter.username = username;
+    }
+
+    @Override
+    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) {
+        LoginParamters loginParams = new LoginParamters(request);
+        Object usr = loginParams.get(MoreParameterAuthenticationFilter.username);
+        Object pwd = loginParams.get(MoreParameterAuthenticationFilter.password);
+
+        UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(usr, pwd);
 
         authRequest.setDetails(loginParams);
         return this.getAuthenticationManager().authenticate(authRequest);

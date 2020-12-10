@@ -85,9 +85,9 @@ public class LogAspect {
         if (doSelect) {
             IAbstractService selectService = (IAbstractService) SpringContextProvider.getBean((annotation).selectService());
             String id = annotation.id();
-            Map<String, Object> parse = JsonUtil.toMap((String) arg[0]);
-            ApiResponse<Object> apiResponse = selectService.selectByPrimaryKey(parse.get(id));
-            arg[0] = apiResponse.getData();
+//            Map<String, Object> parse = JsonUtil.toMap((String) arg[0]);
+//            ApiResponse<Object> apiResponse = selectService.selectByPrimaryKey(parse.get(id));
+//            arg[0] = apiResponse.getData();
         }
 
         Date actionTime = new Date();
