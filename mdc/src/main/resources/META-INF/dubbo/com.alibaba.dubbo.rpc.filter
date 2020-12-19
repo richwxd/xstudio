@@ -1,0 +1,2 @@
+consumerTraceFilter=com.xstudio.mdc.trace.ConsumerRpcTraceFilter
+providerTraceFilter=com.xstudio.mdc.trace.ProviderRpcTraceFilter

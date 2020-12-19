@@ -7,13 +7,20 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class LoginParamters {
+/**
+ * 登录参数
+ * @author xiaobiao
+ * @version 1.0.0
+ * @date 2020/12/12
+ */
+public class LoginParamters implements Serializable {
 
     /**
      * ip

@@ -4,6 +4,8 @@ dependencies {
 
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
     compile group: 'org.springframework', name: 'spring-webmvc', version: '5.1.7.RELEASE'
+    compile("com.alibaba:dubbo:2.6.5")
 
+    compile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.19'
     compileOnly group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
 }

@@ -26,6 +26,9 @@ public class KryoSerializer {
      */
     @SuppressWarnings("unchecked")
     public static <T> T deserialize(final byte[] dataStream) {
+        if (null == dataStream) {
+            return null;
+        }
         Kryo kryoPoolElement = pool.obtain();
         T deserializedObject = (T) kryoPoolElement.readClassAndObject(new Input(dataStream));
         pool.free(kryoPoolElement);

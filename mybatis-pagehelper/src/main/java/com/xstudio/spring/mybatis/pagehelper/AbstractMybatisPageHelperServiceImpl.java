@@ -30,9 +30,9 @@ public abstract class AbstractMybatisPageHelperServiceImpl<T extends BaseModelOb
         int offset = 0;
         PageBounds pageBounds = new PageBounds(offset, limit);
         boolean doLoop = true;
-        while (Boolean.TRUE.equals(pageListApiResponse.isSuccess()) && doLoop) {
+        while (pageListApiResponse.getSuccess() && doLoop) {
             pageListApiResponse = fuzzySearchByPager(example, pageBounds);
-            if (Boolean.TRUE.equals(pageListApiResponse.isSuccess())) {
+            if (pageListApiResponse.getSuccess()) {
                 doLoop = pageListApiResponse.getData().size() >= limit;
                 list.addAll(pageListApiResponse.getData());
             }
@@ -94,13 +94,13 @@ public abstract class AbstractMybatisPageHelperServiceImpl<T extends BaseModelOb
         pageBounds.setOrders(getOrder(orders));
         boolean doLoop = true;
         Pagination pagination = new Pagination();
-        while (Boolean.TRUE.equals(pageListApiResponse.isSuccess()) && doLoop) {
+        while (pageListApiResponse.getSuccess() && doLoop) {
             if (isWithBlobs()) {
                 pageListApiResponse = selectByExampleWithBlobsByPager(example, pageBounds);
             } else {
                 pageListApiResponse = selectByExampleByPager(example, pageBounds);
             }
-            if (Boolean.TRUE.equals(pageListApiResponse.isSuccess())) {
+            if (pageListApiResponse.getSuccess()) {
                 doLoop = pageListApiResponse.getData().size() >= limit;
                 list.addAll(pageListApiResponse.getData());
             }

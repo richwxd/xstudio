@@ -2,16 +2,11 @@ package com.xstudio.crypto.asymmetric;
 
 import com.xstudio.crypto.Base64Util;
 import com.xstudio.crypto.KeyString;
-import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -38,14 +33,22 @@ import java.util.Base64;
  * @version 2020/10/7
  */
 public class RSAUtil {
-    public static final String RSA_ALGORITHM = "RSA/ECB/PKCS1Padding";
+    public static final String RSA_ALGORITHM = "RSA/ECB/OAEPWITHSHA-256ANDMGF1PADDING";
 
     public static final Charset UTF8 = StandardCharsets.UTF_8;
 
-    public static String base64Encode(byte[] data) {
-        return new BASE64Encoder().encode(data);
+    private static final Base64.Decoder DECODER = Base64.getDecoder();
+
+    private RSAUtil() {
     }
 
+    /**
+     * 建立密钥对
+     *
+     * @param keySize 关键尺寸
+     * @return {@link KeyPair}
+     * @throws NoSuchAlgorithmException 没有这样的算法异常
+     */
     public static KeyPair buildKeyPair(int keySize) throws NoSuchAlgorithmException {
         /* RSA算法要求有一个可信任的随机数源 */
         SecureRandom sr = new SecureRandom();
@@ -55,6 +58,123 @@ public class RSAUtil {
         kpg.initialize(keySize, sr);
         /* 生成密匙对 */
         return kpg.generateKeyPair();
+    }
+
+    /**
+     * 解密
+     *
+     * @param privateKey 私钥
+     * @param encrypted  加密
+     * @return {@link byte[]}
+     * @throws NoSuchAlgorithmException  没有这样的算法异常
+     * @throws InvalidKeyException       无效的关键例外
+     * @throws BadPaddingException       坏填充例外
+     * @throws IllegalBlockSizeException 非法的块大小异常
+     * @throws InvalidKeySpecException   无效的关键规范异常
+     * @throws NoSuchPaddingException    没有这样的填充例外
+     */
+    public static byte[] decrypt(String privateKey, String encrypted) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException, InvalidKeySpecException {
+        PrivateKey key = getPrivateKey(privateKey);
+        return decrypt(key, Base64Util.decode(encrypted.getBytes()));
+    }
+
+    /**
+     * 得到私钥
+     *
+     * @param key 密钥字符串（经过base64编码）
+     * @return {@link PrivateKey}
+     * @throws NoSuchAlgorithmException 没有这样的算法异常
+     * @throws InvalidKeySpecException  无效的关键规范异常
+     */
+    public static PrivateKey getPrivateKey(String key) throws NoSuchAlgorithmException, InvalidKeySpecException {
+        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(Base64Util.decode(key.getBytes()));
+        KeyFactory keyFactory = KeyFactory.getInstance(AsymmetricAlgorithm.RSA.getValue());
+        return keyFactory.generatePrivate(keySpec);
+    }
+
+    /**
+     * 解密
+     *
+     * @param privateKey 私钥
+     * @param encrypted  加密
+     * @return {@link byte[]}
+     * @throws NoSuchAlgorithmException  没有这样的算法异常
+     * @throws InvalidKeyException       无效的关键例外
+     * @throws BadPaddingException       坏填充例外
+     * @throws IllegalBlockSizeException 非法的块大小异常
+     * @throws NoSuchPaddingException    没有这样的填充例外
+     */
+    public static byte[] decrypt(PrivateKey privateKey, byte[] encrypted) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
+        Cipher cipher = Cipher.getInstance(RSA_ALGORITHM);
+        cipher.init(Cipher.DECRYPT_MODE, privateKey);
+
+        return cipher.doFinal(encrypted);
+    }
+
+    public static byte[] encrypt(String publickKey, String message) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException, InvalidKeySpecException {
+        PublicKey key = getPublicKey(publickKey);
+        return encrypt(key, message);
+    }
+
+    /**
+     * 得到公钥
+     *
+     * @param key 密钥字符串（经过base64编码）
+     * @return {@link PublicKey}
+     * @throws NoSuchAlgorithmException 没有这样的算法异常
+     * @throws InvalidKeySpecException  无效的关键规范异常
+     */
+    public static PublicKey getPublicKey(String key) throws NoSuchAlgorithmException, InvalidKeySpecException {
+        X509EncodedKeySpec keySpec = new X509EncodedKeySpec(Base64Util.decode(key.getBytes()));
+        KeyFactory keyFactory = KeyFactory.getInstance(AsymmetricAlgorithm.RSA.getValue());
+        return keyFactory.generatePublic(keySpec);
+    }
+
+    public static byte[] encrypt(PublicKey publickKey, String message) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
+        Cipher cipher = Cipher.getInstance(RSA_ALGORITHM);
+        cipher.init(Cipher.ENCRYPT_MODE, publickKey);
+
+        return cipher.doFinal(message.getBytes(UTF8));
+    }
+
+    /**
+     * 加载私钥
+     *
+     * @param privateKeyStr 私钥str
+     * @return {@link RSAPrivateKey}
+     * @throws NoSuchAlgorithmException 没有这样的算法异常
+     * @throws InvalidKeySpecException  无效的关键规范异常
+     */
+    public static RSAPrivateKey loadPrivateKey(String privateKeyStr) throws NoSuchAlgorithmException, InvalidKeySpecException {
+        byte[] buffer = base64Decode(privateKeyStr);
+        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(buffer);
+        KeyFactory keyFactory = KeyFactory.getInstance(RSA_ALGORITHM);
+        return (RSAPrivateKey) keyFactory.generatePrivate(keySpec);
+    }
+
+    /**
+     * base64解码
+     *
+     * @param data 数据
+     * @return {@link byte[]}
+     */
+    public static byte[] base64Decode(String data) {
+        return DECODER.decode(data);
+    }
+
+    /**
+     * 从字符串中加载公钥
+     *
+     * @param publicKeyStr 公钥str
+     * @return {@link RSAPublicKey}
+     * @throws NoSuchAlgorithmException 没有这样的算法异常
+     * @throws InvalidKeySpecException  无效的关键规范异常
+     */
+    public static RSAPublicKey loadPublicKey(String publicKeyStr) throws NoSuchAlgorithmException, InvalidKeySpecException {
+        byte[] buffer = base64Decode(publicKeyStr);
+        KeyFactory keyFactory = KeyFactory.getInstance(RSA_ALGORITHM);
+        X509EncodedKeySpec keySpec = new X509EncodedKeySpec(buffer);
+        return (RSAPublicKey) keyFactory.generatePublic(keySpec);
     }
 
     public static KeyString toKeyString(KeyPair keyPair) {
@@ -74,94 +194,5 @@ public class RSAUtil {
         String retValue = new String(deBase64Value);
 
         return new KeyString(pub, pri, retValue);
-    }
-
-    public static byte[] decrypt(PublicKey publicKey, byte[] encrypted) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
-        Cipher cipher = Cipher.getInstance(RSA_ALGORITHM);
-        cipher.init(Cipher.DECRYPT_MODE, publicKey);
-
-        return cipher.doFinal(encrypted);
-    }
-
-    public static byte[] encrypt(PrivateKey privateKey, String message) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
-        Cipher cipher = Cipher.getInstance(RSA_ALGORITHM);
-        cipher.init(Cipher.ENCRYPT_MODE, privateKey);
-
-        return cipher.doFinal(message.getBytes(UTF8));
-    }
-
-    /**
-     * 加载私钥
-     *
-     * @param privateKeyStr 私钥str
-     * @return {@link RSAPrivateKey}
-     * @throws NoSuchAlgorithmException 没有这样的算法异常
-     * @throws InvalidKeySpecException  无效的关键规范异常
-     * @throws IOException              ioexception
-     */
-    public static RSAPrivateKey loadPrivateKey(String privateKeyStr) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
-        byte[] buffer = base64Decode(privateKeyStr);
-        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(buffer);
-        KeyFactory keyFactory = KeyFactory.getInstance(RSA_ALGORITHM);
-        return (RSAPrivateKey) keyFactory.generatePrivate(keySpec);
-    }
-
-    /**
-     * base64解码
-     *
-     * @param data 数据
-     * @return {@link byte[]}
-     * @throws IOException ioexception
-     */
-    public static byte[] base64Decode(String data) throws IOException {
-        return new BASE64Decoder().decodeBuffer(data);
-    }
-
-    /**
-     * 从字符串中加载公钥
-     *
-     * @param publicKeyStr 公钥str
-     * @return {@link RSAPublicKey}
-     * @throws IOException              ioexception
-     * @throws NoSuchAlgorithmException 没有这样的算法异常
-     * @throws InvalidKeySpecException  无效的关键规范异常
-     */
-    public static RSAPublicKey loadPublicKey(String publicKeyStr) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
-        byte[] buffer = base64Decode(publicKeyStr);
-        KeyFactory keyFactory = KeyFactory.getInstance(RSA_ALGORITHM);
-        X509EncodedKeySpec keySpec = new X509EncodedKeySpec(buffer);
-        return (RSAPublicKey) keyFactory.generatePublic(keySpec);
-    }
-
-    /**
-     * 保存私钥
-     *
-     * @param privateKey 私钥
-     * @param path       路径
-     * @throws IOException ioexception
-     */
-    public void savePrivateKey(PrivateKey privateKey, String path) throws IOException {
-        File f = new File(path);
-        f.getParentFile().mkdirs();
-        try (FileOutputStream fos = new FileOutputStream(f)) {
-            fos.write(privateKey.getEncoded());
-            fos.flush();
-        }
-    }
-
-    /**
-     * 保存公钥
-     *
-     * @param publicKey 公钥
-     * @param path      路径
-     * @throws IOException ioexception
-     */
-    public void savePublicKey(PublicKey publicKey, String path) throws IOException {
-        File f = new File(path);
-        f.getParentFile().mkdirs();
-        try (FileOutputStream fos = new FileOutputStream(f)) {
-            fos.write(publicKey.getEncoded());
-            fos.flush();
-        }
     }
 }

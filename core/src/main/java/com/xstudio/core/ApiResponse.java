@@ -43,6 +43,7 @@ public class ApiResponse<T> implements Serializable {
     public ApiResponse(int code, String msg) {
         this.code = code;
         this.msg = msg;
+        this.success = code == 0;
     }
 
     /**
@@ -54,18 +55,10 @@ public class ApiResponse<T> implements Serializable {
     public void setResult(int code, String msg) {
         this.code = code;
         this.msg = msg;
+        this.success = code == 0;
     }
 
-    /**
-     * 设置结果
-     *
-     * @param data 数据
-     */
-    public void setResult(T data) {
-        this.data = data;
-    }
-
-    public boolean isSuccess() {
+    public boolean getSuccess() {
         return code == 0;
     }
 
@@ -75,6 +68,7 @@ public class ApiResponse<T> implements Serializable {
 
     public void setCode(int code) {
         this.code = code;
+        this.success = code == 0;
     }
 
     public T getData() {
@@ -83,6 +77,7 @@ public class ApiResponse<T> implements Serializable {
 
     public void setData(T data) {
         this.data = data;
+        this.success = true;
     }
 
     public String getMsg() {

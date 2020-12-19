@@ -52,6 +52,7 @@ import java.util.concurrent.TimeUnit;
  * @version 2020/2/12
  */
 public class RequestUtil {
+    public static final String CONTENT_TYPE = "Content-Type";
     /**
      * 未知IP
      */
@@ -60,7 +61,6 @@ public class RequestUtil {
      * 默认content 类型
      */
     private static final String DEFAULT_CONTENT_TYPE = "application/json";
-
     /**
      * 设置传输毫秒数
      */
@@ -88,7 +88,6 @@ public class RequestUtil {
      * 日志
      */
     private static final Logger logger = LoggerFactory.getLogger(RequestUtil.class);
-    public static final String CONTENT_TYPE = "Content-Type";
     /**
      * 监控
      */
@@ -171,30 +170,6 @@ public class RequestUtil {
     }
 
     /**
-     * 发送HTTP_GET请求
-     *
-     * @param url   请求地址
-     * @param param 含参数
-     * @return 远程主机响应正文
-     * 1.该方法会自动关闭连接,释放资源
-     * 2.方法内设置了连接和读取超时时间,单位为毫秒,超时或发生其它异常时方法会自动返回"通信失败"字符串
-     * 3.请求参数含中文时,经测试可直接传入中文,HttpClient会自动编码发给Server,应用时应根据实际效果决
-     * 定传入前是否转码
-     * 4.该方法会自动获取到响应消息头中[Content-Type:text/html; charset=GBK]的charset值作为响应报文的
-     * 解码字符集
-     * 5.若响应消息头中无Content-Type属性,则会使用HttpClient内部默认的ISO-8859-1作为响应报文的解码字符
-     * 集
-     */
-    public static ClientResponse get(String url, String param) {
-        if (null != param) {
-            url += "?" + param;
-        }
-        // 响应内容
-        HttpGet httpget = new HttpGet(url);
-        return res(httpget);
-    }
-
-    /**
      * res
      *
      * @param method 方法
@@ -214,6 +189,7 @@ public class RequestUtil {
             }
         } catch (Exception cte) {
             logger.error("请求连接超时，由于 {}", cte.getLocalizedMessage(), cte);
+            clientResponse = null;
         } finally {
             method.releaseConnection();
         }
@@ -337,6 +313,30 @@ public class RequestUtil {
     }
 
     /**
+     * 发送HTTP_GET请求
+     *
+     * @param url   请求地址
+     * @param param 含参数
+     * @return 远程主机响应正文
+     * 1.该方法会自动关闭连接,释放资源
+     * 2.方法内设置了连接和读取超时时间,单位为毫秒,超时或发生其它异常时方法会自动返回"通信失败"字符串
+     * 3.请求参数含中文时,经测试可直接传入中文,HttpClient会自动编码发给Server,应用时应根据实际效果决
+     * 定传入前是否转码
+     * 4.该方法会自动获取到响应消息头中[Content-Type:text/html; charset=GBK]的charset值作为响应报文的
+     * 解码字符集
+     * 5.若响应消息头中无Content-Type属性,则会使用HttpClient内部默认的ISO-8859-1作为响应报文的解码字符
+     * 集
+     */
+    public static ClientResponse get(String url, String param) {
+        if (null != param) {
+            url += "?" + param;
+        }
+        // 响应内容
+        HttpGet httpget = new HttpGet(url);
+        return res(httpget);
+    }
+
+    /**
      * get请求
      *
      * @param url 请求地址
@@ -405,22 +405,21 @@ public class RequestUtil {
      *
      * @param params 请求参数
      * @return get请求参数
-     * @throws UnsupportedEncodingException {@link UnsupportedEncodingException}
      */
-    public static String getCanonicalQueryString(Map<String, Object> params) throws UnsupportedEncodingException {
+    public static String getCanonicalQueryString(Map<String, Object> params) {
         StringBuilder queryString = new StringBuilder();
         Set<Map.Entry<String, Object>> entries = params.entrySet();
         String value;
         for (Map.Entry<String, Object> entry : entries) {
-            queryString.append("&").append(entry.getKey());
+            queryString.append("&").append(entry.getKey()).append("=");
             if (null != entry.getValue()) {
                 try {
                     value = URLEncoder.encode(String.valueOf(entry.getValue()), StandardCharsets.UTF_8.name());
                     if (null != value) {
-                        queryString.append("=").append(value);
+                        queryString.append(value);
                     }
                 } catch (UnsupportedEncodingException e) {
-                    throw new UnsupportedEncodingException(e.getMessage());
+                    logger.error("参数encoding异常", e);
                 }
             }
         }

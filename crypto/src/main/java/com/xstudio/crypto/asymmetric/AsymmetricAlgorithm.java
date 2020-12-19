@@ -10,19 +10,7 @@ public enum AsymmetricAlgorithm {
     /**
      * RSA算法
      */
-    RSA("RSA"),
-    /**
-     * RSA算法，此算法用了默认补位方式为RSA/ECB/PKCS1Padding
-     */
-    RSA_ECB_PKCS1("RSA/ECB/PKCS1Padding"),
-    /**
-     * RSA算法，此算法用了RSA/None/NoPadding
-     */
-    RSA_None("RSA/None/NoPadding"),
-    /**
-     * EC算法
-     */
-    EC("EC");
+    RSA("RSA");
 
     private String value;
 

@@ -25,7 +25,7 @@ public abstract class AbstractRestController<T extends BaseModelObject<K>, K, P 
         PageRequest webRequest = new PageRequest(pageRequest);
 
         ApiResponse<L> list = getService().fuzzySearchByPager(object, (P) webRequest.getPageBounds());
-        if (!list.isSuccess()) {
+        if (!list.getSuccess()) {
             apiResponse.setResult(ErrorCodeConstant.NO_MATCH, "没有匹配项");
             return apiResponse;
         }
