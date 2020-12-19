@@ -1,0 +1,9 @@
+dependencies {
+    compile project(":core")
+    compile project(":http")
+
+    compile group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
+    compile group: 'org.hibernate.validator', name: 'hibernate-validator', version: '6.1.7.Final'
+
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
+}
