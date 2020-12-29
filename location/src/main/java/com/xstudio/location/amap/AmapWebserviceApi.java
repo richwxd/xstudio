@@ -27,6 +27,15 @@ public class AmapWebserviceApi {
 
     private String key = "";
 
+    /**
+     * 获取 key.
+     *
+     * @return key 值
+     */
+    public String getKey() {
+        return key;
+    }
+
     public AmapWebserviceApi() {
     }
 

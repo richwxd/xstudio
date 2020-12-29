@@ -34,6 +34,15 @@ public class BaiduWebserviceApi {
     }
 
     /**
+     * 获取 ak.
+     *
+     * @return ak 值
+     */
+    public String getAk() {
+        return ak;
+    }
+
+    /**
      * 逆地理编码
      *
      * @param regeoParams regeo参数

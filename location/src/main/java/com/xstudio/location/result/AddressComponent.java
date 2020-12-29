@@ -1,7 +1,7 @@
 package com.xstudio.location.result;
 
 /**
- * 地址元素
+ * 地址
  *
  * @author xiaobiao
  * @version 1.0.0

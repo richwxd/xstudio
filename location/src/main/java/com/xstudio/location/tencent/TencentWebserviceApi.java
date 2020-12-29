@@ -36,6 +36,15 @@ public class TencentWebserviceApi {
     }
 
     /**
+     * 获取 key.
+     *
+     * @return key 值
+     */
+    public String getKey() {
+        return key;
+    }
+
+    /**
      * 逆地理编码
      *
      * @param regeoParams regeo参数

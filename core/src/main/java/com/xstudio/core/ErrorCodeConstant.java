@@ -7,7 +7,14 @@ package com.xstudio.core;
  * @version 2020/2/2
  */
 public class ErrorCodeConstant {
-
+    /**
+     * 服务异常
+     */
+    public static final int SERVICE_INVALID = 9999;
+    /**
+     * 服务异常
+     */
+    public static final String SERVICE_INVALID_MSG = "服务异常";
     /**
      * API调用异常
      */
