@@ -8,19 +8,22 @@ public class HttpClientConfig {
     /**
      * 连接超时时间(单位毫秒): 10S
      */
-    static int httpConnectTimeout = 10000;
+    private static int httpConnectTimeout = 10000;
     /**
      * socket读写超时时间(单位毫秒)
      */
-    static int httpSocketTimeout = 10000;
+    private static int httpSocketTimeout = 10000;
 
-    static int httpMaxPoolSize = 200;
 
-    static int httpMonitorInterval = 3000;
+    private static int httpPerRouteSize = 50;
 
-    static int httpIdleTimeout = 5000;
+    private static int httpMaxPoolSize = 200;
 
-    static int retryTimes = 5;
+    private static int httpMonitorInterval = 3000;
+
+    private static int httpIdleTimeout = 5000;
+
+    private static int retryTimes = 3;
 
     public static int getHttpConnectTimeout() {
         return httpConnectTimeout;
@@ -68,5 +71,25 @@ public class HttpClientConfig {
 
     public static void setRetryTimes(int retryTimes) {
         HttpClientConfig.retryTimes = retryTimes;
+    }
+
+    /**
+     * 获取 httpPerRouteSize.
+     *
+     * @return httpPerRouteSize 值
+     */
+    public static int getHttpPerRouteSize() {
+        return httpPerRouteSize;
+    }
+
+    /**
+     * 设置 httpPerRouteSize.
+     *
+     * <p>通过 getHttpPerRouteSize() 获取 httpPerRouteSize</p>
+     *
+     * @param httpPerRouteSize httpPerRouteSize
+     */
+    public static void setHttpPerRouteSize(int httpPerRouteSize) {
+        HttpClientConfig.httpPerRouteSize = httpPerRouteSize;
     }
 }

@@ -29,7 +29,7 @@ public interface IAbstractDao<T, K, P, M extends List<T>> {
      * @param record 对象
      * @return 插入成功数
      */
-    int batchInsert(List<T> record);
+    int batchInsertSelective(List<T> record);
 
     /**
      * 主键删除

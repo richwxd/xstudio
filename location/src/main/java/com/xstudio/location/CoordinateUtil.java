@@ -2,7 +2,7 @@ package com.xstudio.location;
 
 import com.xstudio.core.ApiResponse;
 import com.xstudio.location.chain.AmapCoordinateService;
-import com.xstudio.location.chain.CoordinateService;
+import com.xstudio.location.chain.CoordinateChain;
 import com.xstudio.location.result.RegeoResult;
 
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ import java.util.List;
  * @date 2020/12/20
  */
 public class CoordinateUtil {
-    private final static List<CoordinateService> services = new ArrayList<>();
+    private final static List<CoordinateChain> services = new ArrayList<>();
 
     static {
         services.add(new AmapCoordinateService("",""));

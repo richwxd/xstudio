@@ -7,17 +7,20 @@ package com.xstudio.spring.redis;
  * @version 2020/2/12
  */
 public class RedisConfigurationMode {
+    private RedisConfigurationMode(){
+
+    }
     /**
      * 独连
      */
-    public static String STANDALONE = "STANDALONE";
+    public static final String STANDALONE = "STANDALONE";
     /**
      * 哨兵
      */
-    public static String SENTINEL = "SENTINEL";
+    public static final String SENTINEL = "SENTINEL";
     /**
      * 集群
      */
-    public static String CLUSTER = "CLUSTER";
+    public static final String CLUSTER = "CLUSTER";
 
 }

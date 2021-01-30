@@ -30,21 +30,24 @@ public abstract class AbstractMybatisPageHelperServiceImpl<T extends BaseModelOb
         int offset = 0;
         PageBounds pageBounds = new PageBounds(offset, limit);
         boolean doLoop = true;
+        int total = 0;
         while (pageListApiResponse.getSuccess() && doLoop) {
             pageListApiResponse = fuzzySearchByPager(example, pageBounds);
             if (pageListApiResponse.getSuccess()) {
                 doLoop = pageListApiResponse.getData().size() >= limit;
                 list.addAll(pageListApiResponse.getData());
+                total += pageListApiResponse.getData().getPagination().getTotal();
             }
             offset = offset + limit;
             pageBounds = new PageBounds(offset, limit);
+
         }
 
         if (list.isEmpty()) {
             apiResponse.setResult(ErrorCodeConstant.NO_MATCH, ErrorCodeConstant.NO_MATCH_MSG);
             return apiResponse;
         }
-        PageResponse<T> pageList = new PageResponse<>(list, pageBounds.getTotal(), 1);
+        PageResponse<T> pageList = new PageResponse<>(list, total, pageBounds.getPage());
         apiResponse.setData(pageList);
         return apiResponse;
     }
@@ -60,37 +63,40 @@ public abstract class AbstractMybatisPageHelperServiceImpl<T extends BaseModelOb
             apiResponse.setResult(ErrorCodeConstant.NO_MATCH, ErrorCodeConstant.NO_MATCH_MSG);
             return apiResponse;
         }
-        PageResponse<T> pageList = new PageResponse<>(result, pageBounds.getTotal(), 1);
+        PageResponse<T> pageList = new PageResponse<>(result, result.getTotal(), pageBounds.getPage());
         apiResponse.setData(pageList);
 
         return apiResponse;
     }
 
     @Override
-    public ApiResponse<PageResponse<T>> selectAllByExample(T example) {
+    public ApiResponse<List<T>> selectAllByExample(T example) {
         List<String> orders = new ArrayList<>();
         orders.add("create_at desc");
         return selectAllByExample(example, orders);
     }
 
     private String getOrder(List<?> orders) {
+        if (CollectionUtils.isEmpty(orders)) {
+            return "";
+        }
         StringBuilder sb = new StringBuilder();
         for (Object order : orders) {
             sb.append(order);
             sb.append(",");
         }
-        sb.reverse();
+        sb.deleteCharAt(sb.length() - 1);
         return sb.toString();
     }
 
     @Override
-    public ApiResponse<PageResponse<T>> selectAllByExample(T example, List<?> orders) {
-        ApiResponse<PageResponse<T>> apiResponse = new ApiResponse<>();
+    public ApiResponse<List<T>> selectAllByExample(T example, List<?> orders) {
+        ApiResponse<List<T>> apiResponse = new ApiResponse<>();
         ApiResponse<PageResponse<T>> pageListApiResponse = new ApiResponse<>();
         List<T> list = new ArrayList<>();
         int limit = 5000;
         PageBounds pageBounds = new PageBounds(1, limit);
-
+        int total = 0;
         pageBounds.setOrders(getOrder(orders));
         boolean doLoop = true;
         Pagination pagination = new Pagination();
@@ -103,16 +109,17 @@ public abstract class AbstractMybatisPageHelperServiceImpl<T extends BaseModelOb
             if (pageListApiResponse.getSuccess()) {
                 doLoop = pageListApiResponse.getData().size() >= limit;
                 list.addAll(pageListApiResponse.getData());
+
+                pageBounds.setPage(pageBounds.getPage() + 1);
+                total += pageListApiResponse.getData().getPagination().getTotal();
             }
-            pagination = pageListApiResponse.getData().getPagination();
-            pageBounds.setPage(pageBounds.getPage() + 1);
         }
 
         if (list.isEmpty()) {
             apiResponse.setResult(ErrorCodeConstant.NO_MATCH, ErrorCodeConstant.NO_MATCH_MSG);
             return apiResponse;
         }
-        PageResponse<T> pageList = new PageResponse<>(list, pagination.getTotal(), 1);
+        PageResponse<T> pageList = new PageResponse<>(list, total, 1);
         apiResponse.setData(pageList);
         return apiResponse;
     }
@@ -122,7 +129,6 @@ public abstract class AbstractMybatisPageHelperServiceImpl<T extends BaseModelOb
         ApiResponse<PageResponse<T>> apiResponse = new ApiResponse<>();
         PageHelper.orderBy(pageBounds.getOrders());
         PageHelper.startPage(pageBounds.getPage(), pageBounds.getLimit());
-
         Page<T> result = getRepositoryDao().selectByExample(example, pageBounds);
         if (result.isEmpty()) {
             apiResponse.setResult(ErrorCodeConstant.NO_MATCH, ErrorCodeConstant.NO_MATCH_MSG);
@@ -145,7 +151,7 @@ public abstract class AbstractMybatisPageHelperServiceImpl<T extends BaseModelOb
             apiResponse.setResult(ErrorCodeConstant.NO_MATCH, ErrorCodeConstant.NO_MATCH_MSG);
             return apiResponse;
         }
-        PageResponse<T> pageList = new PageResponse<>(result, pageBounds.getTotal(), pageBounds.getPage());
+        PageResponse<T> pageList = new PageResponse<>(result, result.getTotal(), pageBounds.getPage());
         apiResponse.setData(pageList);
         return apiResponse;
     }

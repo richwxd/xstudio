@@ -14,7 +14,7 @@ import java.io.IOException;
 /**
  * 用来解决匿名用户访问无权限资源时的异常
  * <p>
- * 区别于 AccessDeineHandler 用来解决认证过的用户访问无权限资源时的异常
+ * 区别于 AccessDenyHandler 用来解决认证过的用户访问无权限资源时的异常
  *
  * @author xiaobiao
  * @version 1.0.0
@@ -26,7 +26,7 @@ public class UnauthorizedAuthenticationEntryPoint implements AuthenticationEntry
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
         ApiResponse<Object> msg = new ApiResponse<>(401, "尚未登录");
-        response.setStatus(HttpStatus.SC_UNAUTHORIZED);
+        response.setStatus(HttpStatus.SC_OK);
         RequestUtil.writeJson(response, msg);
     }
 }

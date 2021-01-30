@@ -6,10 +6,10 @@ import org.junit.jupiter.api.Test;
  * @author xiaobiao
  * @version 2020/2/2
  */
-public class IdCardValueSerializerTest {
+class IdCardValueSerializerTest {
 
     @Test
-    public void write() {
+    void write() {
 
     }
 }

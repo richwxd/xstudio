@@ -1,12 +1,11 @@
 package com.xstudio.serializer;
 
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
 
-import java.lang.reflect.Type;
+import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -18,7 +17,7 @@ import java.util.regex.Pattern;
  * @author xiaobiao
  * @version 2020/2/2
  */
-public class NumberToStarsSerializer implements JsonSerializer<String> {
+public class NumberToStarsSerializer extends JsonSerializer<String> {
     /**
      * 大部分敏感词汇在10个以内，直接返回缓存的字符串
      */
@@ -28,6 +27,20 @@ public class NumberToStarsSerializer implements JsonSerializer<String> {
      * 提取文案中的数字正则表达式
      */
     private static final Pattern PATTERN = Pattern.compile(".*?(\\d+).*?");
+
+    @Override
+    public void serialize(String value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+        Matcher matcher = PATTERN.matcher(value);
+        int length = value.length();
+        if (matcher.find()) {
+            length = matcher.group(1).length();
+        }
+        String text = value.replaceAll("(\\d{1})\\d+(\\d{1})", "$1" + getStarChar(length - 2) + "$2");
+
+        gen.writeStartObject();
+        gen.writeString(text);
+        gen.writeEndObject();
+    }
 
     /**
      * 生成n个星号的字符串
@@ -50,17 +63,5 @@ public class NumberToStarsSerializer implements JsonSerializer<String> {
             arr[i] = '*';
         }
         return new String(arr);
-    }
-
-
-    @Override
-    public JsonElement serialize(String value, Type typeOfSrc, JsonSerializationContext context) {
-        Matcher matcher = PATTERN.matcher(value);
-        int length = value.length();
-        if (matcher.find()) {
-            length = matcher.group(1).length();
-        }
-        String text = value.replaceAll("(\\d{1})\\d+(\\d{1})", "$1" + getStarChar(length - 2) + "$2");
-        return new JsonPrimitive(text);
     }
 }

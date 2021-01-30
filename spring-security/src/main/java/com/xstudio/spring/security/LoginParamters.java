@@ -35,17 +35,19 @@ public class LoginParamters implements Serializable {
     /**
      * 请求参数头
      */
-    private HashMap<String, String> headers;
+    private Map<String, String> headers;
 
     /**
      * 其他参数
      */
-    private HashMap<String, Object> extras;
+    @SuppressWarnings("all")
+    private Map<String, Object> extras;
 
     /**
      * session
      */
-    private HashMap<String, Object> sessions;
+    @SuppressWarnings("all")
+    private Map<String, Object> sessions;
 
     private boolean remember = false;
 
@@ -145,7 +147,7 @@ public class LoginParamters implements Serializable {
      *
      * @return extras 其他参数
      */
-    public HashMap<String, Object> getExtras() {
+    public Map<String, Object> getExtras() {
         return this.extras;
     }
 
@@ -154,7 +156,7 @@ public class LoginParamters implements Serializable {
      *
      * @return headers 请求参数头
      */
-    public HashMap<String, String> getHeaders() {
+    public Map<String, String> getHeaders() {
         return this.headers;
     }
 
@@ -173,7 +175,7 @@ public class LoginParamters implements Serializable {
      *
      * @return sessions session
      */
-    public HashMap<String, Object> getSessions() {
+    public Map<String, Object> getSessions() {
         return this.sessions;
     }
 
@@ -200,7 +202,7 @@ public class LoginParamters implements Serializable {
      *
      * @param extras 其他参数
      */
-    public void setExtras(HashMap<String, Object> extras) {
+    public void setExtras(Map<String, Object> extras) {
         this.extras = extras;
     }
 
@@ -209,7 +211,7 @@ public class LoginParamters implements Serializable {
      *
      * @param headers 请求参数头
      */
-    public void setHeaders(HashMap<String, String> headers) {
+    public void setHeaders(Map<String, String> headers) {
         this.headers = headers;
     }
 
@@ -236,7 +238,7 @@ public class LoginParamters implements Serializable {
      *
      * @param sessions session 会话信息
      */
-    public void setSessions(HashMap<String, Object> sessions) {
+    public void setSessions(Map<String, Object> sessions) {
         this.sessions = sessions;
     }
 

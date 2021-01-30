@@ -35,8 +35,8 @@ public abstract class AbstractServiceImpl<T extends BaseModelObject<K>, K, P, L 
     }
 
     @Override
-    public ApiResponse<L> batchUpdateByPrimaryKeySelective(L records) {
-        ApiResponse<L> apiResponse = new ApiResponse<>();
+    public ApiResponse<List<T>> batchUpdateByPrimaryKeySelective(List<T> records) {
+        ApiResponse<List<T>> apiResponse = new ApiResponse<>();
         if (null == records || records.isEmpty()) {
             apiResponse.setResult(ErrorCodeConstant.NONEMPTY_PARAM, ErrorCodeConstant.NONEMPTY_PARAM_MSG);
             return apiResponse;
@@ -285,8 +285,8 @@ public abstract class AbstractServiceImpl<T extends BaseModelObject<K>, K, P, L 
     public abstract String getActorId(T record);
 
     @Override
-    public ApiResponse<L> batchInsert(L records) {
-        ApiResponse<L> apiResponse = new ApiResponse<>();
+    public ApiResponse<List<T>> batchInsertSelective(List<T> records) {
+        ApiResponse<List<T>> apiResponse = new ApiResponse<>();
         if (null == records || records.isEmpty()) {
             apiResponse.setResult(ErrorCodeConstant.INSERT_NONE, ErrorCodeConstant.INSERT_NONE_MSG);
             return apiResponse;
@@ -299,7 +299,7 @@ public abstract class AbstractServiceImpl<T extends BaseModelObject<K>, K, P, L 
         int insertCount = 0;
         List<List<T>> lists = ListUtils.partition(records, batchPerSqlNumber);
         for (List<T> list : lists) {
-            insertCount = insertCount + getRepositoryDao().batchInsert(list);
+            insertCount = insertCount + getRepositoryDao().batchInsertSelective(list);
         }
 
         if (0 == insertCount) {

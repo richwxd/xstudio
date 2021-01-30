@@ -12,5 +12,6 @@ include 'aop'
 include 'crypto'
 include 'mdc'
 include 'spring-security'
-include 'location'
+//include 'location'
+include 'cache'
 

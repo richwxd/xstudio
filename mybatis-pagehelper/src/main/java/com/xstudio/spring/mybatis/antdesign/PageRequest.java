@@ -1,7 +1,7 @@
 package com.xstudio.spring.mybatis.antdesign;
 
 import com.xstudio.antdesign.TableRequest;
-import org.apache.ibatis.session.RowBounds;
+import com.xstudio.spring.mybatis.pagehelper.PageBounds;
 
 /**
  * 分页请求
@@ -21,8 +21,10 @@ public class PageRequest extends TableRequest {
         this.setSorter(request.getSorter());
     }
 
-    public RowBounds getPageBounds() {
-        return new RowBounds(getCurrentPage(), getPageSize());
+    public PageBounds getPageBounds() {
+        PageBounds pageBounds = new PageBounds(getCurrentPage(), getPageSize());
+        pageBounds.setOrders(getOrder());
+        return pageBounds;
     }
 
     private String getOrder() {

@@ -23,7 +23,7 @@ public interface IAbstractService<T, K, P, L extends List<T>, D extends List<T>>
      * @param record 对象
      * @return 插入成功数
      */
-    ApiResponse<L> batchInsert(L record);
+    ApiResponse<List<T>> batchInsertSelective(List<T> record);
 
     /**
      * 批量按主键更新设定的值
@@ -31,7 +31,7 @@ public interface IAbstractService<T, K, P, L extends List<T>, D extends List<T>>
      * @param record 值
      * @return 更新的条数
      */
-    ApiResponse<L> batchUpdateByPrimaryKeySelective(L record);
+    ApiResponse<List<T>> batchUpdateByPrimaryKeySelective(List<T> record);
 
     /**
      * 统计总数
@@ -103,7 +103,7 @@ public interface IAbstractService<T, K, P, L extends List<T>, D extends List<T>>
      * @param example 条件
      * @return 对象list
      */
-    ApiResponse<L> selectAllByExample(T example);
+    ApiResponse<List<T>> selectAllByExample(T example);
 
     /**
      * 按条件获取（含大字段），指定排序
@@ -112,7 +112,7 @@ public interface IAbstractService<T, K, P, L extends List<T>, D extends List<T>>
      * @param orders  排序
      * @return 对象list
      */
-    ApiResponse<L> selectAllByExample(T example, List<?> orders);
+    ApiResponse<List<T>> selectAllByExample(T example, List<?> orders);
 
     /**
      * 分页获取

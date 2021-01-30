@@ -1,12 +1,14 @@
 package com.xstudio.serializer;
 
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
-import java.lang.reflect.Type;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -20,7 +22,7 @@ import java.util.regex.Pattern;
  * @author xiaobiao
  * @version 2020/2/2
  */
-public class IdCardValueSerializer implements JsonSerializer<String> {
+public class IdCardValueSerializer extends JsonSerializer<String> {
     /**
      * 大部分敏感词汇在10个以内，直接返回缓存的字符串
      */
@@ -42,7 +44,7 @@ public class IdCardValueSerializer implements JsonSerializer<String> {
     private static final Pattern PATTERN = Pattern.compile(REGEX);
 
     @Override
-    public JsonElement serialize(String value, Type typeOfSrc, JsonSerializationContext context) {
+    public void serialize(String value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
         Matcher matcher = PATTERN.matcher(value);
         if (matcher.find()) {
             StringBuilder sb = new StringBuilder();
@@ -50,8 +52,10 @@ public class IdCardValueSerializer implements JsonSerializer<String> {
             int length = matcher.group(2).length();
             sb.append(STAR_ARR.get(length));
             sb.append(matcher.group(3));
-            return new JsonPrimitive(sb.toString());
+
+            gen.writeStartObject();
+            gen.writeString(sb.toString());
+            gen.writeEndObject();
         }
-        return new JsonPrimitive(value);
     }
 }

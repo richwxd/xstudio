@@ -4,6 +4,7 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.data.redis.connection.*;
 import org.springframework.data.redis.connection.jedis.JedisClientConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
@@ -24,6 +25,9 @@ import java.util.List;
  */
 public class RedisConfigurationUtil {
     private static final Logger log = LoggerFactory.getLogger(RedisConfigurationUtil.class);
+    private RedisConfigurationUtil() {
+
+    }
 
     /**
      * 获得redisTemplate
@@ -34,7 +38,6 @@ public class RedisConfigurationUtil {
      */
     public static RedisTemplate<Object, Object> getRedisTemplate(BasicRedisProperties redisProperties) {
         RedisConfiguration configuration = null;
-        RedisConnectionFactory connectionFactory;
         // redis 连接模式
         // 0 - standalone
         // 1 - sentinel
@@ -52,22 +55,9 @@ public class RedisConfigurationUtil {
             log.info("{} redis 使用哨兵模式配置{} ", redisProperties.getName(), redisProperties.getSentinel().getMaster());
             // 哨兵模式
             redisMode = RedisConfigurationMode.SENTINEL;
-            List<String> sentinelNodes = redisProperties.getSentinel().getNodes();
-            if (!CollectionUtils.isEmpty(sentinelNodes)) {
-                configuration = new RedisSentinelConfiguration();
-                ((RedisSentinelConfiguration) configuration).master(redisProperties.getSentinel().getMaster());
-                List<RedisNode> sentinelRedisNodes = new ArrayList<>();
-                for (String node : sentinelNodes) {
-                    String[] hostAndPort = node.split(":");
-                    sentinelRedisNodes.add(new RedisNode(hostAndPort[0], Integer.parseInt(hostAndPort[1])));
-                }
-                ((RedisSentinelConfiguration) configuration).setSentinels(sentinelRedisNodes);
-
-                ((RedisSentinelConfiguration) configuration).setDatabase(redisProperties.getDatabase());
-                if (!ObjectUtils.isEmpty(redisProperties.getPassword())) {
-                    RedisPassword redisPassword = RedisPassword.of(redisProperties.getPassword());
-                    ((RedisSentinelConfiguration) configuration).setPassword(redisPassword);
-                }
+            RedisConfiguration redisConfiguration = redisConfiguration(redisProperties);
+            if (null != redisConfiguration) {
+                configuration = redisConfiguration;
             }
         }
 
@@ -76,35 +66,69 @@ public class RedisConfigurationUtil {
             log.info("{} redis 使用cluster配置", redisProperties.getName());
             redisMode = RedisConfigurationMode.CLUSTER;
             List<String> clusterNodes = redisProperties.getCluster().getNodes();
-            if (!CollectionUtils.isEmpty(clusterNodes)) {
-                configuration = new RedisClusterConfiguration();
-                List<RedisNode> redisNodes = new ArrayList<>();
-                for (String node : clusterNodes) {
-                    String[] hostAndPort = node.split(":");
-                    redisNodes.add(new RedisNode(hostAndPort[0], Integer.parseInt(hostAndPort[1])));
-                }
-                ((RedisClusterConfiguration) configuration).setClusterNodes(redisNodes);
-
-                ((RedisClusterConfiguration) configuration).setMaxRedirects(redisProperties.getCluster().getMaxRedirects());
-                if (!ObjectUtils.isEmpty(redisProperties.getPassword())) {
-                    RedisPassword redisPassword = RedisPassword.of(redisProperties.getPassword());
-                    ((RedisClusterConfiguration) configuration).setPassword(redisPassword);
-                }
+            RedisClusterConfiguration redisClusterConfiguration = redisConfiguration(redisProperties, clusterNodes);
+            if (null != redisClusterConfiguration) {
+                configuration = redisClusterConfiguration;
             }
         }
 
+        if (null == configuration) {
+            throw new RedisConnectionFailureException("redis配置错误");
+        }
         /* ========= 连接池通用配置 ========= */
         GenericObjectPoolConfig<?> genericObjectPoolConfig = new GenericObjectPoolConfig<>();
         BasicRedisProperties.Lettuce lettuce = redisProperties.getLettuce();
         if (null != lettuce.getPool()) {
-            return lettucePool(redisProperties, configuration, genericObjectPoolConfig, lettuce);
+            return pool(redisProperties, configuration, genericObjectPoolConfig, lettuce);
         }
 
         BasicRedisProperties.Jedis jedis = redisProperties.getJedis();
         if (null != jedis.getPool()) {
-            return jedisPool(redisProperties, configuration, redisMode, genericObjectPoolConfig, jedis);
+            return pool(redisProperties, configuration, redisMode, genericObjectPoolConfig, jedis);
         }
 
+        return null;
+    }
+
+    private static RedisSentinelConfiguration redisConfiguration(BasicRedisProperties redisProperties) {
+        List<String> sentinelNodes = redisProperties.getSentinel().getNodes();
+        if (!CollectionUtils.isEmpty(sentinelNodes)) {
+            RedisSentinelConfiguration configuration = new RedisSentinelConfiguration();
+            configuration.master(redisProperties.getSentinel().getMaster());
+            List<RedisNode> sentinelRedisNodes = new ArrayList<>();
+            for (String node : sentinelNodes) {
+                String[] hostAndPort = node.split(":");
+                sentinelRedisNodes.add(new RedisNode(hostAndPort[0], Integer.parseInt(hostAndPort[1])));
+            }
+            configuration.setSentinels(sentinelRedisNodes);
+
+            configuration.setDatabase(redisProperties.getDatabase());
+            if (!ObjectUtils.isEmpty(redisProperties.getPassword())) {
+                RedisPassword redisPassword = RedisPassword.of(redisProperties.getPassword());
+                configuration.setPassword(redisPassword);
+            }
+            return configuration;
+        }
+        return null;
+    }
+
+    private static RedisClusterConfiguration redisConfiguration(BasicRedisProperties redisProperties, List<String> clusterNodes) {
+        if (!CollectionUtils.isEmpty(clusterNodes)) {
+            RedisClusterConfiguration configuration = new RedisClusterConfiguration();
+            List<RedisNode> redisNodes = new ArrayList<>();
+            for (String node : clusterNodes) {
+                String[] hostAndPort = node.split(":");
+                redisNodes.add(new RedisNode(hostAndPort[0], Integer.parseInt(hostAndPort[1])));
+            }
+            configuration.setClusterNodes(redisNodes);
+
+            configuration.setMaxRedirects(redisProperties.getCluster().getMaxRedirects());
+            if (!ObjectUtils.isEmpty(redisProperties.getPassword())) {
+                RedisPassword redisPassword = RedisPassword.of(redisProperties.getPassword());
+                configuration.setPassword(redisPassword);
+            }
+            return configuration;
+        }
         return null;
     }
 
@@ -118,8 +142,8 @@ public class RedisConfigurationUtil {
      * @return RedisTemplate
      * @see RedisTemplate
      */
-    private static RedisTemplate<Object, Object> lettucePool(BasicRedisProperties redisProperties, RedisConfiguration configuration, GenericObjectPoolConfig<?> genericObjectPoolConfig, BasicRedisProperties.Lettuce lettuce) {
-        RedisConnectionFactory connectionFactory;
+    private static RedisTemplate<Object, Object> pool(BasicRedisProperties redisProperties, RedisConfiguration configuration, GenericObjectPoolConfig<?> genericObjectPoolConfig, BasicRedisProperties.Lettuce lettuce) {
+        LettuceConnectionFactory connectionFactory;
         genericObjectPoolConfig.setMaxTotal(lettuce.getPool().getMaxActive());
         genericObjectPoolConfig.setMinIdle(lettuce.getPool().getMinIdle());
         genericObjectPoolConfig.setMaxIdle(lettuce.getPool().getMaxIdle());
@@ -133,7 +157,7 @@ public class RedisConfigurationUtil {
         }
 
         connectionFactory = new LettuceConnectionFactory(configuration, builder.build());
-        ((LettuceConnectionFactory) connectionFactory).afterPropertiesSet();
+        connectionFactory.afterPropertiesSet();
         /* ========= 创建 template ========= */
         log.info("{} 使用 lettuce 连接池 {}", redisProperties.getName(), configuration.getClass().getName());
         return createRedisTemplate(connectionFactory);
@@ -149,8 +173,8 @@ public class RedisConfigurationUtil {
      * @param jedis                   能
      * @return RedisTemplate&lt;Object, Object&gt;
      */
-    private static RedisTemplate<Object, Object> jedisPool(BasicRedisProperties redisProperties, RedisConfiguration configuration, String redisMode, GenericObjectPoolConfig<?> genericObjectPoolConfig, BasicRedisProperties.Jedis jedis) {
-        RedisConnectionFactory connectionFactory;
+    private static RedisTemplate<Object, Object> pool(BasicRedisProperties redisProperties, RedisConfiguration configuration, String redisMode, GenericObjectPoolConfig<?> genericObjectPoolConfig, BasicRedisProperties.Jedis jedis) {
+        JedisConnectionFactory connectionFactory;
         genericObjectPoolConfig.setMaxTotal(jedis.getPool().getMaxActive());
         genericObjectPoolConfig.setMinIdle(jedis.getPool().getMinIdle());
         genericObjectPoolConfig.setMaxIdle(jedis.getPool().getMaxIdle());
@@ -170,7 +194,7 @@ public class RedisConfigurationUtil {
             default:
                 connectionFactory = new JedisConnectionFactory((RedisStandaloneConfiguration) configuration, builder.build());
         }
-        ((JedisConnectionFactory) connectionFactory).afterPropertiesSet();
+        connectionFactory.afterPropertiesSet();
 
         log.info("{} redis 使用jedis 连接池", redisProperties.getName());
         /* ========= 创建 template ========= */

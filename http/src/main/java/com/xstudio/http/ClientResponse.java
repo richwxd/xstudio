@@ -5,22 +5,40 @@ import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.message.BasicStatusLine;
 
-import java.io.Serializable;
-
 /**
  * @author xiaobiao
  * @version 2020/2/12
  */
-public class ClientResponse implements Serializable {
+@SuppressWarnings("all")
+public class ClientResponse {
+    /**
+     * 返回内容
+     */
+    private String content;
     /**
      * 请求对象
      */
     private CloseableHttpResponse origin;
 
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
     /**
-     * 返回内容
+     * 获取statusCode
+     *
+     * @return {@link StatusLine}
      */
-    private String content;
+    public int statusCode() {
+        if (null == this.getOrigin()) {
+            return 500;
+        }
+        return this.getOrigin().getStatusLine().getStatusCode();
+    }
 
     /**
      * 获取statusLine
@@ -37,31 +55,11 @@ public class ClientResponse implements Serializable {
         return this.getOrigin().getStatusLine();
     }
 
-    /**
-     * 获取statusCode
-     *
-     * @return {@link StatusLine}
-     */
-    public int statusCode() {
-        if (null == this.getOrigin()) {
-            return 500;
-        }
-        return this.getOrigin().getStatusLine().getStatusCode();
-    }
-
     public CloseableHttpResponse getOrigin() {
         return origin;
     }
 
     public void setOrigin(CloseableHttpResponse origin) {
         this.origin = origin;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
     }
 }

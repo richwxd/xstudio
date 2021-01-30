@@ -14,6 +14,10 @@ public class Base64Util {
         throw new IllegalStateException("Utility class");
     }
 
+    private static final Base64.Encoder ENCODER = Base64.getEncoder();
+
+    private static final Base64.Decoder DECODER = Base64.getDecoder();
+
     /**
      * 解密
      *
@@ -24,7 +28,7 @@ public class Base64Util {
         if (src.length == 0) {
             return src;
         }
-        return Base64.getDecoder().decode(src);
+        return DECODER.decode(src);
     }
 
     /**
@@ -37,6 +41,19 @@ public class Base64Util {
         if (src.length == 0) {
             return src;
         }
-        return Base64.getEncoder().encode(src);
+        return ENCODER.encode(src);
+    }
+
+    /**
+     * 编码
+     *
+     * @param src src
+     * @return {@link byte[]}
+     */
+    public static String encodeToString(byte[] src) {
+        if (src.length == 0) {
+            return "";
+        }
+        return ENCODER.encodeToString(src);
     }
 }

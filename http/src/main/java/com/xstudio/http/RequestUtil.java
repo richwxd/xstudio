@@ -3,10 +3,12 @@ package com.xstudio.http;
 import com.xstudio.core.ApiResponse;
 import com.xstudio.core.ErrorCodeConstant;
 import com.xstudio.core.JsonUtil;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.apache.http.*;
 import org.apache.http.client.HttpRequestRetryHandler;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -51,8 +53,11 @@ import java.util.concurrent.TimeUnit;
  * @author xiaobiao
  * @version 2020/2/12
  */
+@SuppressWarnings("unused")
 public class RequestUtil {
+
     public static final String CONTENT_TYPE = "Content-Type";
+    public static final String TRACE_ID = "TRACE_ID";
     /**
      * 未知IP
      */
@@ -64,25 +69,28 @@ public class RequestUtil {
     /**
      * 设置传输毫秒数
      */
-    private static final int SOCKET_TIMEOUT = HttpClientConfig.httpSocketTimeout;
+    private static final int SOCKET_TIMEOUT = HttpClientConfig.getHttpSocketTimeout();
     /**
      * 设置每个路由的基础连接数
      */
-    private static final int MAX_PRE_ROUTE = HttpClientConfig.httpMaxPoolSize;
+    private static final int MAX_PRE_ROUTE = HttpClientConfig.getHttpPerRouteSize();
     /**
      * 最大连接数
      */
-    private static final int MAX_ROUTE = HttpClientConfig.httpMaxPoolSize;
+    private static final int MAX_ROUTE = HttpClientConfig.getHttpMaxPoolSize();
     /**
      * 最大连接
      */
-    private static final int MAX_CONNECTION = HttpClientConfig.httpMaxPoolSize;
+    private static final int MAX_CONNECTION = HttpClientConfig.getHttpMaxPoolSize();
     /**
      * 设置重用连接时间
      */
     private static final int VALIDATE_TIME = 30000;
+
     private static final String LOCALHOST = "127.0.0.1";
+
     private static final String USER_AGENT = "User-Agent";
+
     private static final Object SYNC_LOCK = new Object();
     /**
      * 日志
@@ -110,7 +118,7 @@ public class RequestUtil {
             connectionManager.close();
             monitorExecutor.shutdown();
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("", e);
         }
     }
 
@@ -127,9 +135,15 @@ public class RequestUtil {
         ApiResponse<T> apiResponse = new ApiResponse<>();
 
         ClientResponse clientResponse = RequestUtil.postForm(url, params);
+        if (null == clientResponse) {
+            logger.error("API服务调用异常 {} null", url);
+            apiResponse.setResult(ErrorCodeConstant.API_INVALID, ErrorCodeConstant.API_INVALID_MSG);
+            apiResponse.setMsg("空返回请求");
+            return apiResponse;
+        }
 
         if (HttpStatus.SC_OK != clientResponse.getOrigin().getStatusLine().getStatusCode()) {
-            logger.error("API服务调用异常 {} {}", clientResponse.getOrigin().getStatusLine().getStatusCode(), clientResponse.getContent());
+            logger.error("API服务调用异常 {} {} {}", url, clientResponse.getOrigin().getStatusLine().getStatusCode(), clientResponse.getContent());
             apiResponse.setResult(ErrorCodeConstant.API_INVALID, ErrorCodeConstant.API_INVALID_MSG);
             apiResponse.setMsg(String.valueOf(clientResponse.getOrigin().getStatusLine().getStatusCode()));
             return apiResponse;
@@ -137,7 +151,7 @@ public class RequestUtil {
 
         T data = JsonUtil.toObject(clientResponse.getContent(), type);
         if (null == data) {
-            logger.debug("API服务调用返回 {}", clientResponse.getContent());
+            logger.debug("API服务调用返回 {} {}", url, clientResponse.getContent());
             apiResponse.setMsg("服务异常[" + apiResponse.getCode() + "]" + apiResponse.getMsg());
             apiResponse.setCode(ErrorCodeConstant.API_INVALID);
             return apiResponse;
@@ -176,8 +190,42 @@ public class RequestUtil {
      * @return {@link ClientResponse}
      */
     private static ClientResponse res(HttpRequestBase method) {
+        return res(method, HttpClientConfig.getHttpSocketTimeout());
+    }
+
+    /**
+     * res
+     *
+     * @param method 方法
+     * @return {@link ClientResponse}
+     */
+    private static ClientResponse res(HttpRequestBase method, Integer timeout) {
+        return res(method, null, timeout);
+    }
+
+    /**
+     * res
+     *
+     * @param method 方法
+     * @return {@link ClientResponse}
+     */
+    private static ClientResponse res(HttpRequestBase method, List<Header> headers, Integer timeout) {
         HttpClientContext context = HttpClientContext.create();
         ClientResponse clientResponse = new ClientResponse();
+
+        RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(timeout).build();
+        method.setConfig(requestConfig);
+
+        if (!CollectionUtils.isEmpty(headers)) {
+            for (Header header : headers) {
+                method.addHeader(header);
+            }
+        }
+
+        if (null == method.getHeaders(TRACE_ID)) {
+            method.addHeader(TRACE_ID, UUID.randomUUID().toString());
+        }
+
         try (CloseableHttpResponse response = getHttpClient(method.getURI().toString()).execute(method, context)) {
             // 获取响应实体
             HttpEntity entity = response.getEntity();
@@ -188,7 +236,7 @@ public class RequestUtil {
                 EntityUtils.consume(entity);
             }
         } catch (Exception cte) {
-            logger.error("请求连接超时，由于 {}", cte.getLocalizedMessage(), cte);
+            logger.error("{} 接口请求连接超时，由于 {}", method.getURI(), cte.getLocalizedMessage(), cte);
             clientResponse = null;
         } finally {
             method.releaseConnection();
@@ -223,12 +271,12 @@ public class RequestUtil {
                                                             // 关闭异常连接
                                                             connectionManager.closeExpiredConnections();
                                                             // 关闭5s空闲的连接
-                                                            connectionManager.closeIdleConnections(HttpClientConfig.httpIdleTimeout, TimeUnit.MILLISECONDS);
-                                                            logger.debug("close expired and idle for over {}s connection", HttpClientConfig.httpIdleTimeout);
+                                                            connectionManager.closeIdleConnections(HttpClientConfig.getHttpIdleTimeout(), TimeUnit.MILLISECONDS);
+                                                            logger.debug("close expired and idle for over {}s connection", HttpClientConfig.getHttpPerRouteSize());
                                                         }
                                                     }
-                        , HttpClientConfig.httpMonitorInterval
-                        , HttpClientConfig.httpMonitorInterval
+                        , HttpClientConfig.getHttpMonitorInterval()
+                        , HttpClientConfig.getHttpMonitorInterval()
                         , TimeUnit.MILLISECONDS);
             }
         }
@@ -270,9 +318,9 @@ public class RequestUtil {
         // 请求重试处理
         HttpRequestRetryHandler httpRequestRetryHandler = (exception, executionCount, context) -> {
             // 如果已经重试了n次，就放弃
-            if (executionCount >= HttpClientConfig.retryTimes) {
+            if (executionCount >= HttpClientConfig.getRetryTimes()) {
                 // 重试超过n次,放弃请求
-                logger.error("retry has more than {} time, give up request", HttpClientConfig.retryTimes);
+                logger.error("retry has more than {} time, give up request", HttpClientConfig.getRetryTimes());
                 return false;
             }
             // 如果服务器丢掉了连接，那么就重试
@@ -315,8 +363,8 @@ public class RequestUtil {
     /**
      * 发送HTTP_GET请求
      *
-     * @param url   请求地址
-     * @param param 含参数
+     * @param url    请求地址
+     * @param params 请求参数
      * @return 远程主机响应正文
      * 1.该方法会自动关闭连接,释放资源
      * 2.方法内设置了连接和读取超时时间,单位为毫秒,超时或发生其它异常时方法会自动返回"通信失败"字符串
@@ -327,13 +375,49 @@ public class RequestUtil {
      * 5.若响应消息头中无Content-Type属性,则会使用HttpClient内部默认的ISO-8859-1作为响应报文的解码字符
      * 集
      */
-    public static ClientResponse get(String url, String param) {
-        if (null != param) {
-            url += "?" + param;
+    public static ClientResponse get(String url, Map<String, Object> params) {
+        return get(url, params, HttpClientConfig.getHttpSocketTimeout());
+    }
+
+    public static ClientResponse get(String url, Map<String, Object> params, Integer timeout) {
+        String queryString = getCanonicalQueryString(params);
+        if (!url.endsWith("?")) {
+            url += "?";
         }
-        // 响应内容
-        HttpGet httpget = new HttpGet(url);
-        return res(httpget);
+
+        return get(url + queryString, timeout);
+    }
+
+    /**
+     * 获取get请求拼接后的值
+     *
+     * @param params 请求参数
+     * @return get请求参数
+     */
+    public static String getCanonicalQueryString(Map<String, Object> params) {
+        StringBuilder queryString = new StringBuilder();
+        Set<Map.Entry<String, Object>> entries = params.entrySet();
+        String value;
+        for (Map.Entry<String, Object> entry : entries) {
+            queryString.append("&").append(entry.getKey()).append("=");
+            if (null != entry.getValue()) {
+                try {
+                    value = URLEncoder.encode(String.valueOf(entry.getValue()), StandardCharsets.UTF_8.name());
+                    if (null != value) {
+                        queryString.append(value);
+                    }
+                } catch (UnsupportedEncodingException e) {
+                    logger.error("参数encoding异常", e);
+                }
+            }
+        }
+
+        return queryString.substring(1);
+    }
+
+    public static ClientResponse get(String url, Integer timeout) {
+        HttpGet get = new HttpGet(url);
+        return res(get, timeout);
     }
 
     /**
@@ -343,8 +427,16 @@ public class RequestUtil {
      * @return ClientResponse
      */
     public static ClientResponse get(String url) {
+        return get(url, HttpClientConfig.getHttpSocketTimeout());
+    }
+
+    public static ClientResponse get(String url, List<Header> headers) {
+        return get(url, headers, HttpClientConfig.getHttpSocketTimeout());
+    }
+
+    public static ClientResponse get(String url, List<Header> headers, Integer timeout) {
         HttpGet get = new HttpGet(url);
-        return res(get);
+        return res(get, headers, timeout);
     }
 
     /**
@@ -382,49 +474,6 @@ public class RequestUtil {
             sb.append(str);
         }
         return sb.toString();
-    }
-
-    /**
-     * get请求
-     *
-     * @param url    请求地址
-     * @param cookie Cookie内容
-     * @return ClientResponse
-     */
-    public static ClientResponse getByCookie(String url, String cookie) {
-        HttpGet get = new HttpGet(url);
-        if (StringUtils.isNotBlank(cookie)) {
-            get.addHeader("cookie", cookie);
-        }
-
-        return res(get);
-    }
-
-    /**
-     * 获取get请求拼接后的值
-     *
-     * @param params 请求参数
-     * @return get请求参数
-     */
-    public static String getCanonicalQueryString(Map<String, Object> params) {
-        StringBuilder queryString = new StringBuilder();
-        Set<Map.Entry<String, Object>> entries = params.entrySet();
-        String value;
-        for (Map.Entry<String, Object> entry : entries) {
-            queryString.append("&").append(entry.getKey()).append("=");
-            if (null != entry.getValue()) {
-                try {
-                    value = URLEncoder.encode(String.valueOf(entry.getValue()), StandardCharsets.UTF_8.name());
-                    if (null != value) {
-                        queryString.append(value);
-                    }
-                } catch (UnsupportedEncodingException e) {
-                    logger.error("参数encoding异常", e);
-                }
-            }
-        }
-
-        return queryString.substring(1);
     }
 
     /**
@@ -467,14 +516,11 @@ public class RequestUtil {
      * @return String
      */
     public static String getServerName(HttpServletRequest request) {
-
-        String serverName = "";
         try {
-            serverName = request.getHeader(USER_AGENT);
+            return request.getHeader(USER_AGENT);
         } catch (Exception e) {
             return UNKNOWN;
         }
-        return serverName;
     }
 
     /**
@@ -521,17 +567,15 @@ public class RequestUtil {
      * post请求
      *
      * @param url     地址
-     * @param data    请求的body数据
+     * @param jsonBody    请求的body数据
      * @param headers 请求的headers
      * @return ClientResponse
      */
-    public static ClientResponse post(String url, String data, Map<String, String> headers) {
+    public static ClientResponse post(String url, String jsonBody, Map<String, String> headers) {
         HttpPost post = new HttpPost(url);
-        if (StringUtils.isNotBlank(data) && !headers.containsKey(CONTENT_TYPE)) {
-            post.addHeader(CONTENT_TYPE, DEFAULT_CONTENT_TYPE);
-        }
-        setHeaders(headers, post);
-        post.setEntity(new StringEntity(data, ContentType.APPLICATION_JSON));
+        post.addHeader(CONTENT_TYPE, DEFAULT_CONTENT_TYPE);
+        addHeaders(headers, post);
+        post.setEntity(new StringEntity(jsonBody, ContentType.APPLICATION_JSON));
         return res(post);
     }
 
@@ -541,7 +585,7 @@ public class RequestUtil {
      * @param headers 请求headers
      * @param post    请求
      */
-    private static void setHeaders(Map<String, String> headers, HttpPost post) {
+    private static void addHeaders(Map<String, String> headers, HttpRequestBase post) {
         if (null != headers && !headers.isEmpty()) {
             Set<Map.Entry<String, String>> headersEntryset = headers.entrySet();
             for (Map.Entry<String, String> header : headersEntryset) {
@@ -554,16 +598,11 @@ public class RequestUtil {
      * post请求
      *
      * @param url  地址
-     * @param data 请求的body数据
+     * @param jsonBody 请求的body数据
      * @return ClientResponse
      */
-    public static ClientResponse post(String url, String data) {
-        HttpPost post = new HttpPost(url);
-        if (StringUtils.isNotBlank(data)) {
-            post.addHeader(CONTENT_TYPE, DEFAULT_CONTENT_TYPE);
-        }
-        post.setEntity(new StringEntity(data, ContentType.APPLICATION_JSON));
-        return res(post);
+    public static ClientResponse post(String url, String jsonBody) {
+        return post(url, jsonBody, new HashMap<>());
     }
 
     /**

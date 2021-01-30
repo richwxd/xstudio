@@ -26,14 +26,26 @@ public class LoginUser<T> extends User {
     /**
      * 用户详细信息
      */
+    @SuppressWarnings("all")
     private T details;
     /**
      * 用户ID
      */
     private String userId;
 
+    /**
+     * 用户昵称
+     */
+    private String userNickname;
+
     public LoginUser(String username, String password, Collection<? extends GrantedAuthority> authorities) {
         super(username, password, authorities);
+    }
+
+    public LoginUser(String userId, String userNickname, String username, String password, Collection<? extends GrantedAuthority> authorities) {
+        super(username, password, authorities);
+        this.userId = userId;
+        this.userNickname = userNickname;
     }
 
     public LoginUser(String username, String password, boolean enabled, boolean accountNonExpired, boolean credentialsNonExpired, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities) {
@@ -77,5 +89,14 @@ public class LoginUser<T> extends User {
 
     public String getUserId() {
         return userId;
+    }
+
+    /**
+     * 获取 userNickname.
+     *
+     * @return userNickname 值
+     */
+    public String getUserNickname() {
+        return userNickname;
     }
 }
