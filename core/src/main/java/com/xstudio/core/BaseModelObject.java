@@ -1,6 +1,8 @@
 package com.xstudio.core;
 
-import com.google.gson.annotations.Expose;
+import com.xstudio.core.date.DateTime;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -11,43 +13,30 @@ import java.util.Date;
  * @author xiaobiao
  * @version 2020/2/2
  */
+@ApiModel("基础对象")
 public abstract class BaseModelObject<K> implements Serializable {
 
     /**
      * 创建时间
      */
-    private Date createAt;
-    /**
-     * 创建开始时间
-     */
-    @Expose(serialize = false)
-    private Date createAtBegin;
-    /**
-     * 结束开始时间
-     */
-    @Expose(serialize = false)
-    private Date createAtEnd;
+    @ApiModelProperty(value = "创建日期", name = "createAt", dataType = "Date", example = "2021-01-00 13:00:21", allowableValues = "")
+    private DateTime createAt;
+
     /**
      * 创建人ID
      */
+    @ApiModelProperty(value = "创建人ID", name = "createBy", dataType = "String", example = "2019282716253425", allowableValues = "")
     private String createBy;
     /**
      * 更新时间
      */
-    private Date updateAt;
-    /**
-     * 更新开始时间
-     */
-    @Expose(serialize = false)
-    private Date updateAtBegin;
-    /**
-     * 更新结束时间
-     */
-    @Expose(serialize = false)
-    private Date updateAtEnd;
+    @ApiModelProperty(value = "更新日期", name = "updateAt", dataType = "Date", example = "2021-01-00 13:00:21", allowableValues = "")
+    private DateTime updateAt;
+
     /**
      * 更新人ID
      */
+    @ApiModelProperty(value = "更新人ID", name = "updateBy", dataType = "String", example = "2019282716253425", allowableValues = "")
     private String updateBy;
 
     /**
@@ -76,7 +65,7 @@ public abstract class BaseModelObject<K> implements Serializable {
         return createAt;
     }
 
-    public void setCreateAt(Date createAt) {
+    public void setCreateAt(DateTime createAt) {
         this.createAt = createAt;
     }
 
@@ -103,7 +92,7 @@ public abstract class BaseModelObject<K> implements Serializable {
         return updateAt;
     }
 
-    public void setUpdateAt(Date updateAt) {
+    public void setUpdateAt(DateTime updateAt) {
         this.updateAt = updateAt;
     }
 

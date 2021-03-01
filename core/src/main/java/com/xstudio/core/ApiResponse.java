@@ -1,5 +1,8 @@
 package com.xstudio.core;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -9,27 +12,32 @@ import java.util.List;
  * @author xiaobiao
  * @version 2020/2/2
  */
+@ApiModel("接口请求返回")
 public class ApiResponse<T> implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
      * 错误码，默认0
      */
+    @ApiModelProperty(value = "错误码", name = "code", dataType = "int", example = "0", allowableValues = "")
     private int code = 0;
 
     /**
      * 返回的数据，可以任意集合或对象
      */
+    @ApiModelProperty(value = "返回的数据", name = "data", dataType = "any", example = "", allowableValues = "")
     private T data;
 
     /**
      * 是否成功
      */
+    @ApiModelProperty(value = "数据请求状态", name = "success", dataType = "boolean", example = "true", allowableValues = "true|false")
     private boolean success;
 
     /**
      * 结果说明
      */
+    @ApiModelProperty(value = "返回结果说明", name = "msg", dataType = "string", example = "", allowableValues = "")
     private String msg = "";
 
     /**
