@@ -54,6 +54,13 @@ public class JavaBeansUtil {
         return null;
     }
 
+    /**
+     * 获取get方法名称
+     *
+     * @param property 字段名 {@link String}
+     * @return {@link String}
+     * @see String
+     */
     public static String getGetterMethodName(String property) {
         StringBuilder sb = new StringBuilder();
 
@@ -70,6 +77,13 @@ public class JavaBeansUtil {
     }
 
 
+    /**
+     * 获取set方法名称
+     *
+     * @param property 字段名 {@link String}
+     * @return {@link String}
+     * @see String
+     */
     public static String getSetterMethodName(String property) {
         StringBuilder sb = new StringBuilder();
 
