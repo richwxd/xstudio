@@ -1,3 +1,22 @@
 allprojects {
     apply from: "${rootProject.projectDir}/common.gradle"
 }
+
+task uploadAll(type: GradleBuild) {
+    tasks = [
+            ':antdesign:uploadArchives',
+            ':aop:uploadArchives',
+            ':api-gateway:uploadArchives',
+            ':cache:uploadArchives',
+            ':core:uploadArchives',
+            ':crypto:uploadArchives',
+            ':http:uploadArchives',
+            ':mdc:uploadArchives',
+            ':mybatis:uploadArchives',
+            ':mybatis-pagehelper:uploadArchives',
+            ':redis:uploadArchives',
+            ':serializer:uploadArchives',
+            ':spring-security:uploadArchives',
+            ':spring-web:uploadArchives',
+    ]
+}

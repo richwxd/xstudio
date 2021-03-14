@@ -102,8 +102,8 @@ uploadArchives {
                 name 'xstudio common utils'
                 packaging 'jar'
                 // optionally artifactId can be defined here
-                description 'https://github.com/xbeeant/xstudio'
-                url 'https://github.com/xbeeant/java-code-merger'
+                description 'xstudio common utils'
+                url 'https://github.com/xbeeant/xstudio'
 
                 scm {
                     connection = "https://github.com/xbeeant/xstudio"
