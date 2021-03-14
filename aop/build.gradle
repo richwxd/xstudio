@@ -1,4 +1,4 @@
-group 'com.xstudio'
+group 'io.github.xbeeant'
 version '1.0.0-SNAPSHOT'
 
 dependencies {
