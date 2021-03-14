@@ -1,4 +1,4 @@
-rootProject.name = 'xstudio'
+rootProject.name = 'io.github.xbeeant'
 include 'antdesign'
 include 'core'
 include 'serializer'

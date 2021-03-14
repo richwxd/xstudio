@@ -1,7 +1,8 @@
 apply plugin: 'idea'
 apply plugin: 'java'
 apply plugin: 'jacoco'
-apply plugin: "maven-publish"
+apply plugin: 'maven'
+apply plugin: 'signing'
 
 repositories {
     maven {
@@ -27,6 +28,9 @@ repositories {
     }
     maven {
         url "https://maven.aliyun.com/repository/apache-snapshots"
+    }
+    maven {
+        url "https://s01.oss.sonatype.org/content/groups/public/"
     }
     mavenCentral()
     mavenLocal()
@@ -77,25 +81,36 @@ artifacts {
     archives sourceJar
 }
 
-publishing {
+signing {
+    sign configurations.archives
+}
+
+uploadArchives {
     repositories {
-        maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/xbeeant/xstudio")
-            credentials {
-                username = "huangxb0512@gmail.com"
-                password = System.getenv("token")
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: System.getenv("user"), password: System.getenv("pwd"))
             }
-        }
-    }
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-            artifact sourceJar
-            artifact javadocJar
-            pom {
-                description = "xstudio spring & java tool"
-                url = "https://maven.pkg.github.com/xbeeant/xstudio"
+
+            snapshotRepository(url: "https://s01.oss.sonatype.org/content/repositories/snapshots/") {
+                authentication(userName: System.getenv("user"), password: System.getenv("pwd"))
+            }
+
+            pom.project {
+                name 'xstudio common utils'
+                packaging 'jar'
+                // optionally artifactId can be defined here
+                description 'https://github.com/xbeeant/xstudio'
+                url 'https://github.com/xbeeant/java-code-merger'
+
+                scm {
+                    connection = "https://github.com/xbeeant/xstudio"
+                    developerConnection = "https://github.com/xbeeant/xstudio"
+                    url = "https://github.com/xbeeant/xstudio/packages"
+                }
+
                 licenses {
                     license {
                         name = "MIT License"
@@ -109,15 +124,11 @@ publishing {
                         email = "huangxb0512@gmail.com"
                     }
                 }
-                scm {
-                    connection = "https://github.com/xbeeant/xstudio"
-                    developerConnection = "https://github.com/xbeeant/xstudio"
-                    url = "https://github.com/xbeeant/xstudio/packages"
-                }
             }
         }
     }
 }
+
 
 javadoc {
     if(JavaVersion.current().isJava9Compatible()) {
@@ -132,6 +143,6 @@ javadoc {
     }
 }
 
-group 'com.xstudio'
+group 'io.github.xbeeant'
 version '1.0.0-SNAPSHOT'
 sourceCompatibility = 1.8
