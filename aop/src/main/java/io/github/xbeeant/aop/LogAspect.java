@@ -72,7 +72,7 @@ public class LogAspect {
 
         // 请求的 类名、方法名
         String className = joinPoint.getTarget().getClass().getName();
-        String methodName = AspectJUtils.getMethodName(joinPoint);
+        String methodName = AspectJUtil.getMethodName(joinPoint);
 
 
         ILogService logService = (ILogService) SpringContextProvider.getBean((annotation).service());

@@ -6,9 +6,9 @@ import org.aspectj.lang.JoinPoint;
  * @author xiaobiao
  * @version 2020/2/16
  */
-public class AspectJUtils {
-    private AspectJUtils() {
-        throw new UnsupportedOperationException("AspectJUtils can't be instantiated");
+public class AspectJUtil {
+    private AspectJUtil() {
+        throw new UnsupportedOperationException("AspectJUtil can't be instantiated");
     }
 
     /**

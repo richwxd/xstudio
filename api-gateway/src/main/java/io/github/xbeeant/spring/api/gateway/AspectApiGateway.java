@@ -67,7 +67,7 @@ public class AspectApiGateway {
                     getUri(request), request,
                     limit.getTimes(),
                     limit.getUnit(),
-                    (RedisTemplate<Object, Object>) SpringContextProvider.getBean(annotation.redisTemplateBean())
+                    SpringContextProvider.getBean(annotation.redisTemplateBean())
             );
             if (Boolean.FALSE.equals(checkResult)) {
                 ApiResponse<Object> apiResponse = new ApiResponse<>();

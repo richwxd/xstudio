@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class DefaultLogServiceImpl implements ILogService {
-    private static Logger logger = LoggerFactory.getLogger(DefaultLogServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(DefaultLogServiceImpl.class);
 
     @Override
     public void doLog(LogEntity log) {
