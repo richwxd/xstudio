@@ -4,7 +4,7 @@ import io.github.xbeeant.aop.annotation.Log;
 import io.github.xbeeant.aop.entity.LogEntity;
 import io.github.xbeeant.aop.service.ILogService;
 import io.github.xbeeant.core.service.IAbstractService;
-import io.github.xbeeant.http.RequestUtil;
+import io.github.xbeeant.http.Requests;
 import io.github.xbeeant.spring.web.SpringContextProvider;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -72,7 +72,7 @@ public class LogAspect {
 
         // 请求的 类名、方法名
         String className = joinPoint.getTarget().getClass().getName();
-        String methodName = AspectJUtil.getMethodName(joinPoint);
+        String methodName = AspectHelper.getMethodName(joinPoint);
 
 
         ILogService logService = (ILogService) SpringContextProvider.getBean((annotation).service());
@@ -96,8 +96,8 @@ public class LogAspect {
         LogEntity log = new LogEntity();
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
 
-        log.setIp(RequestUtil.getIp(request));
-        String userAgent = RequestUtil.getUserAgent(request);
+        log.setIp(Requests.getIp(request));
+        String userAgent = Requests.getUserAgent(request);
         if (null != userAgent) {
             Client client = uaParser.parse(userAgent);
             log.setAgent(client);

@@ -1,7 +1,7 @@
 package io.github.xbeeant.aop;
 
 import io.github.xbeeant.aop.annotation.UnEscapeField;
-import io.github.xbeeant.core.JavaBeansUtil;
+import io.github.xbeeant.core.JavaBeansHelper;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -80,12 +80,12 @@ public class EscapeSpecialStringAspect {
                     continue;
                 }
 
-                Object value = JavaBeansUtil.getter(obj, fieldName);
+                Object value = JavaBeansHelper.getter(obj, fieldName);
                 /*
                  * enum 或 null 不进行字符转义
                  */
                 if (null != value && !(value instanceof Enum)) {
-                    value = JsonpUtil.clean((String) value);
+                    value = JsonpHelper.clean((String) value);
                     doFieldValueSet(obj, fieldName, value);
                 }
             }
@@ -93,7 +93,7 @@ public class EscapeSpecialStringAspect {
     }
 
     private void doFieldValueSet(Object obj, String fieldName, Object value) {
-        JavaBeansUtil.setter(obj, fieldName, value);
+        JavaBeansHelper.setter(obj, fieldName, value);
     }
 
     /**

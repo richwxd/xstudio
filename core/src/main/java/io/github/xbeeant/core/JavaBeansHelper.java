@@ -10,10 +10,10 @@ import java.lang.reflect.Method;
  * @author xiaobiao
  * @version 2020/2/16
  */
-public class JavaBeansUtil {
-    private static final Logger logger = LoggerFactory.getLogger(JavaBeansUtil.class);
+public class JavaBeansHelper {
+    private static final Logger logger = LoggerFactory.getLogger(JavaBeansHelper.class);
 
-    private JavaBeansUtil() {
+    private JavaBeansHelper() {
         throw new UnsupportedOperationException("JavaBeansUtil can't be instantiated");
     }
 

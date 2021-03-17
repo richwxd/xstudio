@@ -1,7 +1,7 @@
 package io.github.xbeeant.spring.security.handler;
 
 import io.github.xbeeant.core.ApiResponse;
-import io.github.xbeeant.http.RequestUtil;
+import io.github.xbeeant.http.Requests;
 import io.github.xbeeant.spring.security.LoginUser;
 import org.apache.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -28,7 +28,7 @@ public class AuthenticationSuccessHandler extends SavedRequestAwareAuthenticatio
         ApiResponse<Object> msg = new ApiResponse<>();
         msg.setData(setData(authentication));
         // 返回json
-        RequestUtil.writeJson(response, msg);
+        Requests.writeJson(response, msg);
     }
 
     public Object setData(Authentication authentication) {

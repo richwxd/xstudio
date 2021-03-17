@@ -12,13 +12,13 @@ import java.text.DateFormat;
  * @author xiaobiao
  * @version 2020/09/14
  */
-public class JsonUtil {
+public class JsonHelper {
     private static final Gson GSON = new GsonBuilder()
             .setDateFormat(DateFormat.MEDIUM)
             .disableHtmlEscaping()
             .create();
 
-    private JsonUtil() {
+    private JsonHelper() {
     }
 
     /**

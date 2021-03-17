@@ -1,5 +1,6 @@
 package io.github.xbeeant.core;
 
+import io.github.xbeeant.core.exception.SizeLimitException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,7 +14,7 @@ import java.util.UUID;
  *
  * @author xiaobiao
  */
-public class RandomUtil {
+public class RandomHelper {
     /**
      * 定义验证码字符.去除了0、O、I、L等容易混淆的字母
      */
@@ -21,7 +22,7 @@ public class RandomUtil {
             'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
             'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'j', 'k', 'm', 'n', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
 
-    private static final Logger logger = LoggerFactory.getLogger(RandomUtil.class);
+    private static final Logger logger = LoggerFactory.getLogger(RandomHelper.class);
     /**
      * 所有字符串
      */
@@ -49,7 +50,7 @@ public class RandomUtil {
         }
     }
 
-    private RandomUtil() {
+    private RandomHelper() {
         throw new IllegalStateException("Utility class");
     }
 
@@ -104,11 +105,6 @@ public class RandomUtil {
         return min + random.nextInt(max - min);
     }
 
-    public static String uuid(int length) {
-        UUID uuid = UUID.randomUUID();
-        return uuid.toString().replace("-", "").substring(0, length);
-    }
-
     /**
      * 返回一个定长的随机纯大写字母字符串(只包含大小写字母)
      *
@@ -130,37 +126,8 @@ public class RandomUtil {
         for (int i = 0; i < length; i++) {
             sb.append(ALLCHAR.charAt(random.nextInt(LETTERCHAR.length())));
         }
+
         return sb.toString();
-    }
-
-    /**
-     * 获取不带<code>-</code>的UUID
-     *
-     * @return {@link String}
-     */
-    public static String nonLineUUID() {
-        return UUID.randomUUID().toString().replace("-", "");
-    }
-
-    /**
-     * 每次生成的len位数都不相同
-     *
-     * @param len   长度
-     * @param param 参数
-     * @return 定长的数字
-     */
-    public static int notSimple(int[] param, int len) {
-        for (int i = param.length; i > 1; i--) {
-            int index = random.nextInt(i);
-            int tmp = param[index];
-            param[index] = param[i - 1];
-            param[i - 1] = tmp;
-        }
-        int result = 0;
-        for (int i = 0; i < len; i++) {
-            result = result * 10 + param[i];
-        }
-        return result;
     }
 
     /**
@@ -195,19 +162,29 @@ public class RandomUtil {
     }
 
     /**
-     * 生成时间字符串
+     * 返回一个定长的随机纯大写字母字符串(只包含大写字母)
      *
-     * @param length 附带随机字（字符+数字）符串长度
-     * @return String
+     * @param length 随机字符串长度
+     * @return 随机字符串
      */
-    public static String timeStringPlus(int length) {
-        //当前时间戳
-        String timeString = String.valueOf(System.currentTimeMillis());
-        //加入?位随机数
-        if (length > 0) {
-            timeString = timeString.concat(mix(length));
+    public static String upper(int length) {
+        return mix(length).toUpperCase();
+    }
+
+    /**
+     * UUID不带
+     *
+     * @param length 长度
+     * @return UUID不带`-`
+     */
+    public static String uuid(int length) {
+        UUID uuid = UUID.randomUUID();
+
+        String uuidStr = uuid.toString();
+        if(length > uuidStr.length()) {
+            throw new SizeLimitException("长度超过最大UUID尺寸");
         }
-        return timeString;
+        return uuidStr.replace("-", "").substring(0, length);
     }
 
     /**
@@ -222,15 +199,5 @@ public class RandomUtil {
             sb.append('0');
         }
         return sb.toString();
-    }
-
-    /**
-     * 返回一个定长的随机纯大写字母字符串(只包含大写字母)
-     *
-     * @param length 随机字符串长度
-     * @return 随机字符串
-     */
-    public static String upper(int length) {
-        return mix(length).toUpperCase();
     }
 }

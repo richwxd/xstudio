@@ -1,7 +1,7 @@
 package io.github.xbeeant.spring.security.handler;
 
 import io.github.xbeeant.core.ApiResponse;
-import io.github.xbeeant.http.RequestUtil;
+import io.github.xbeeant.http.Requests;
 import org.apache.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -27,6 +27,6 @@ public class UnauthorizedAuthenticationEntryPoint implements AuthenticationEntry
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
         ApiResponse<Object> msg = new ApiResponse<>(401, "尚未登录");
         response.setStatus(HttpStatus.SC_OK);
-        RequestUtil.writeJson(response, msg);
+        Requests.writeJson(response, msg);
     }
 }

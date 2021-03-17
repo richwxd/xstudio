@@ -1,7 +1,7 @@
 package io.github.xbeeant.spring.security.handler;
 
 import io.github.xbeeant.core.ApiResponse;
-import io.github.xbeeant.http.RequestUtil;
+import io.github.xbeeant.http.Requests;
 import io.github.xbeeant.spring.security.exception.ExpiredAuthCodeException;
 import io.github.xbeeant.spring.security.exception.InvalidAuthCodeException;
 import org.springframework.security.authentication.*;
@@ -50,6 +50,6 @@ public class AuthenticationFailedHandler implements AuthenticationFailureHandler
         } else if (null != exception.getMessage()) {
             msg.setMsg(exception.getMessage());
         }
-        RequestUtil.writeJson(response, msg);
+        Requests.writeJson(response, msg);
     }
 }

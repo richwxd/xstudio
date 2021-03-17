@@ -1,7 +1,7 @@
 package io.github.xbeeant.aop.service;
 
 import io.github.xbeeant.aop.entity.LogEntity;
-import io.github.xbeeant.core.JsonUtil;
+import io.github.xbeeant.core.JsonHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -17,7 +17,7 @@ public class DefaultLogServiceImpl implements ILogService {
     @Override
     public void doLog(LogEntity log) {
         if (logger.isInfoEnabled()) {
-            logger.info("{}", JsonUtil.toJsonString(log));
+            logger.info("{}", JsonHelper.toJsonString(log));
         }
     }
 }

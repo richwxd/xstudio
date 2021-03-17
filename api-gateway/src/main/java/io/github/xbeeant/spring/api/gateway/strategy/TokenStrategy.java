@@ -1,6 +1,6 @@
 package io.github.xbeeant.spring.api.gateway.strategy;
 
-import io.github.xbeeant.http.RequestUtil;
+import io.github.xbeeant.http.Requests;
 import io.github.xbeeant.spring.redis.RedisHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -24,7 +24,7 @@ public class TokenStrategy extends AbstractStrategy {
             token = request.getHeader("token");
         }
         if (StringUtils.isEmpty(token)) {
-            token = RequestUtil.getIp(request);
+            token = Requests.getIp(request);
         }
 
         Long incr = RedisHelper.incr(key + token, 1, unit, redisTemplate);

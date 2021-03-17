@@ -2,7 +2,7 @@ package io.github.xbeeant.spring.security;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import io.github.xbeeant.http.RequestUtil;
+import io.github.xbeeant.http.Requests;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -55,13 +55,13 @@ public class LoginParamters implements Serializable {
         String body;
         // body参数
         try {
-            body = RequestUtil.getBody(request);
+            body = Requests.getBody(request);
         } catch (IOException e) {
             body = "";
         }
 
-        this.ip = RequestUtil.getIp(request);
-        this.userAgent = RequestUtil.getUserAgent(request);
+        this.ip = Requests.getIp(request);
+        this.userAgent = Requests.getUserAgent(request);
         // get parameters from body
         if (!StringUtils.isEmpty(body)) {
             Type type = new TypeToken<Map<String, Object>>() {}.getType();

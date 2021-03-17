@@ -9,7 +9,7 @@ import org.jsoup.safety.Whitelist;
  * @author xiaobiao
  * @version 2020/2/16
  */
-public class JsonpUtil {
+public class JsonpHelper {
     /**
      * 使用自带的basicWithImages 白名单
      * 允许的便签有a,b,blockquote,br,cite,code,dd,dl,dt,em,i,li,ol,p,pre,q,small,span,
@@ -33,7 +33,7 @@ public class JsonpUtil {
         WHITELIST.addAttributes("radio", "controls", "src", "title", "alt");
     }
 
-    private JsonpUtil() {
+    private JsonpHelper() {
         throw new UnsupportedOperationException("JsonpUtil can't be instantiated");
     }
 

@@ -11,7 +11,7 @@ import java.util.concurrent.Executors;
  * @author xiaobiao
  * @version 2020/3/1
  */
-public class RequestUtilTest {
+public class RequestsTest {
 
     @Test
     public void testClient() throws InterruptedException {
@@ -56,7 +56,7 @@ public class RequestUtilTest {
         @Override
         public void run() {
             try {
-                System.out.println(RequestUtil.get(url));
+                System.out.println(Requests.get(url));
             } finally {
                 countDownLatch.countDown();
             }

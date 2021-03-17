@@ -2,7 +2,7 @@ package io.github.xbeeant.http;
 
 import io.github.xbeeant.core.ApiResponse;
 import io.github.xbeeant.core.ErrorCodeConstant;
-import io.github.xbeeant.core.JsonUtil;
+import io.github.xbeeant.core.JsonHelper;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
@@ -54,7 +54,7 @@ import java.util.concurrent.TimeUnit;
  * @version 2020/2/12
  */
 @SuppressWarnings("unused")
-public class RequestUtil {
+public class Requests {
 
     public static final String CONTENT_TYPE = "Content-Type";
     public static final String TRACE_ID = "TRACE_ID";
@@ -95,7 +95,7 @@ public class RequestUtil {
     /**
      * 日志
      */
-    private static final Logger logger = LoggerFactory.getLogger(RequestUtil.class);
+    private static final Logger logger = LoggerFactory.getLogger(Requests.class);
     /**
      * 监控
      */
@@ -134,7 +134,7 @@ public class RequestUtil {
     public static <T> ApiResponse<T> formPostProxy(Map<String, String> params, String url, Class<T> type) {
         ApiResponse<T> apiResponse = new ApiResponse<>();
 
-        ClientResponse clientResponse = RequestUtil.postForm(url, params);
+        ClientResponse clientResponse = Requests.postForm(url, params);
         if (null == clientResponse) {
             logger.error("API服务调用异常 {} null", url);
             apiResponse.setResult(ErrorCodeConstant.API_INVALID, ErrorCodeConstant.API_INVALID_MSG);
@@ -149,7 +149,7 @@ public class RequestUtil {
             return apiResponse;
         }
 
-        T data = JsonUtil.toObject(clientResponse.getContent(), type);
+        T data = JsonHelper.toObject(clientResponse.getContent(), type);
         if (null == data) {
             logger.debug("API服务调用返回 {} {}", url, clientResponse.getContent());
             apiResponse.setMsg("服务异常[" + apiResponse.getCode() + "]" + apiResponse.getMsg());
@@ -656,7 +656,7 @@ public class RequestUtil {
         PrintWriter out;
         try {
             out = response.getWriter();
-            out.println(JsonUtil.toJsonString(object));
+            out.println(JsonHelper.toJsonString(object));
         } catch (IOException e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
