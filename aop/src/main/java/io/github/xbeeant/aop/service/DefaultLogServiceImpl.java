@@ -7,6 +7,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 /**
+ * 默认日志实现类
+ *
  * @author xiaobiao
  * @version 2020/2/16
  */

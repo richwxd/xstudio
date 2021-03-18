@@ -16,8 +16,8 @@ import java.util.concurrent.*;
  * @date 2020/12/16
  */
 @SuppressWarnings("unused")
-public class TraceThreadUtil {
-    private TraceThreadUtil() {
+public class TraceThreadHelper {
+    private TraceThreadHelper() {
         throw new IllegalStateException("Utility class");
     }
 
@@ -70,32 +70,32 @@ public class TraceThreadUtil {
     public static class ThreadPoolTaskExecutorMdcWrapper extends ThreadPoolTaskExecutor {
         @Override
         public void execute(Runnable task) {
-            super.execute(TraceThreadUtil.wrap(task, MDC.getCopyOfContextMap()));
+            super.execute(TraceThreadHelper.wrap(task, MDC.getCopyOfContextMap()));
         }
 
         @Override
         public void execute(Runnable task, long startTimeout) {
-            super.execute(TraceThreadUtil.wrap(task, MDC.getCopyOfContextMap()), startTimeout);
+            super.execute(TraceThreadHelper.wrap(task, MDC.getCopyOfContextMap()), startTimeout);
         }
 
         @Override
         public Future<?> submit(Runnable task) {
-            return super.submit(TraceThreadUtil.wrap(task, MDC.getCopyOfContextMap()));
+            return super.submit(TraceThreadHelper.wrap(task, MDC.getCopyOfContextMap()));
         }
 
         @Override
         public <T> Future<T> submit(Callable<T> task) {
-            return super.submit(TraceThreadUtil.wrap(task, MDC.getCopyOfContextMap()));
+            return super.submit(TraceThreadHelper.wrap(task, MDC.getCopyOfContextMap()));
         }
 
         @Override
         public ListenableFuture<?> submitListenable(Runnable task) {
-            return super.submitListenable(TraceThreadUtil.wrap(task, MDC.getCopyOfContextMap()));
+            return super.submitListenable(TraceThreadHelper.wrap(task, MDC.getCopyOfContextMap()));
         }
 
         @Override
         public <T> ListenableFuture<T> submitListenable(Callable<T> task) {
-            return super.submitListenable(TraceThreadUtil.wrap(task, MDC.getCopyOfContextMap()));
+            return super.submitListenable(TraceThreadHelper.wrap(task, MDC.getCopyOfContextMap()));
         }
     }
 
@@ -123,22 +123,22 @@ public class TraceThreadUtil {
 
         @Override
         public void execute(Runnable task) {
-            super.execute(TraceThreadUtil.wrap(task, MDC.getCopyOfContextMap()));
+            super.execute(TraceThreadHelper.wrap(task, MDC.getCopyOfContextMap()));
         }
 
         @Override
         public Future<?> submit(Runnable task) {
-            return super.submit(TraceThreadUtil.wrap(task, MDC.getCopyOfContextMap()));
+            return super.submit(TraceThreadHelper.wrap(task, MDC.getCopyOfContextMap()));
         }
 
         @Override
         public <T> Future<T> submit(Runnable task, T result) {
-            return super.submit(TraceThreadUtil.wrap(task, MDC.getCopyOfContextMap()), result);
+            return super.submit(TraceThreadHelper.wrap(task, MDC.getCopyOfContextMap()), result);
         }
 
         @Override
         public <T> Future<T> submit(Callable<T> task) {
-            return super.submit(TraceThreadUtil.wrap(task, MDC.getCopyOfContextMap()));
+            return super.submit(TraceThreadHelper.wrap(task, MDC.getCopyOfContextMap()));
         }
     }
 
@@ -158,17 +158,17 @@ public class TraceThreadUtil {
 
         @Override
         public void execute(Runnable task) {
-            super.execute(TraceThreadUtil.wrap(task, MDC.getCopyOfContextMap()));
+            super.execute(TraceThreadHelper.wrap(task, MDC.getCopyOfContextMap()));
         }
 
         @Override
         public <T> ForkJoinTask<T> submit(Callable<T> task) {
-            return super.submit(TraceThreadUtil.wrap(task, MDC.getCopyOfContextMap()));
+            return super.submit(TraceThreadHelper.wrap(task, MDC.getCopyOfContextMap()));
         }
 
         @Override
         public <T> ForkJoinTask<T> submit(Runnable task, T result) {
-            return super.submit(TraceThreadUtil.wrap(task, MDC.getCopyOfContextMap()), result);
+            return super.submit(TraceThreadHelper.wrap(task, MDC.getCopyOfContextMap()), result);
         }
     }
 }

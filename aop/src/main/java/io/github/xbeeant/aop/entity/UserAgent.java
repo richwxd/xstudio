@@ -3,19 +3,26 @@ package io.github.xbeeant.aop.entity;
 import java.io.Serializable;
 
 /**
+ * user-agent
+ *
  * @author xiaobiao
  * @version 2020/2/17
  */
 public class UserAgent implements Serializable {
+    private String device;
     private String family;
-
-    private String version;
-
     private String os;
 
     private String osVersion;
+    private String version;
 
-    private String device;
+    public String getDevice() {
+        return device;
+    }
+
+    public void setDevice(String device) {
+        this.device = device;
+    }
 
     public String getFamily() {
         return family;
@@ -23,14 +30,6 @@ public class UserAgent implements Serializable {
 
     public void setFamily(String family) {
         this.family = family;
-    }
-
-    public String getVersion() {
-        return version;
-    }
-
-    public void setVersion(String version) {
-        this.version = version;
     }
 
     public String getOs() {
@@ -49,12 +48,12 @@ public class UserAgent implements Serializable {
         this.osVersion = osVersion;
     }
 
-    public String getDevice() {
-        return device;
+    public String getVersion() {
+        return version;
     }
 
-    public void setDevice(String device) {
-        this.device = device;
+    public void setVersion(String version) {
+        this.version = version;
     }
 
     @Override

@@ -3,6 +3,8 @@ package io.github.xbeeant.aop;
 import org.aspectj.lang.JoinPoint;
 
 /**
+ * Aspect工具类
+ *
  * @author xiaobiao
  * @version 2020/2/16
  */

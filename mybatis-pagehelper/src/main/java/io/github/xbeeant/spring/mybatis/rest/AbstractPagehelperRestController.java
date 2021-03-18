@@ -5,6 +5,7 @@ import io.github.xbeeant.antdesign.TableResponse;
 import io.github.xbeeant.core.ApiResponse;
 import io.github.xbeeant.core.BaseModelObject;
 import io.github.xbeeant.core.ErrorCodeConstant;
+import io.github.xbeeant.core.service.IAbstractService;
 import io.github.xbeeant.spring.mybatis.antdesign.PageRequest;
 import io.github.xbeeant.spring.mybatis.antdesign.PageResponse;
 import io.github.xbeeant.spring.mybatis.pagehelper.PageBounds;
@@ -22,7 +23,10 @@ import javax.servlet.http.HttpServletResponse;
  * @author xiaobiao
  * @version 2020/2/3
  */
-public interface AbstractPagehelperRestController<T extends BaseModelObject<K>, K> extends AbstractRestController<T, K, PageBounds, PageResponse<T>, Page<T>> {
+public abstract class AbstractPagehelperRestController<T extends BaseModelObject<K>, K> extends AbstractRestController<T, K, PageBounds, PageResponse<T>, Page<T>> {
+
+    @Override
+    public abstract IAbstractService<T, K, PageBounds, PageResponse<T>, Page<T>> getService();
 
     /**
      * 表格查询
@@ -37,7 +41,7 @@ public interface AbstractPagehelperRestController<T extends BaseModelObject<K>, 
      */
     @ApiOperation(value = "表格查询", notes = "单表信息查询")
     @GetMapping(value = {"table"})
-    default ApiResponse<TableResponse<T>> table(
+    public ApiResponse<TableResponse<T>> table(
             @ApiParam(value = "对象", required = true) T object,
             @ApiParam(value = "页面要求", required = true) PageRequest pageRequest,
             HttpServletRequest request, HttpServletResponse response) {

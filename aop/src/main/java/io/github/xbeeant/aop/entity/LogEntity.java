@@ -6,6 +6,8 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
+ * 日志对象
+ *
  * @author xiaobiao
  * @version 2020/2/16
  */

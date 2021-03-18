@@ -17,7 +17,7 @@ import java.util.List;
  * @author xiaobiao
  * @version 2020/2/3
  */
-public interface AbstractRestController<T extends BaseModelObject<K>, K, P, L extends List<T>, D extends List<T>> {
+public abstract class AbstractRestController<T extends BaseModelObject<K>, K, P, L extends List<T>, D extends List<T>> {
 
     /**
      * 通过主键删除记录
@@ -29,7 +29,7 @@ public interface AbstractRestController<T extends BaseModelObject<K>, K, P, L ex
      */
     @ApiOperation(value = "删除", notes = "")
     @DeleteMapping(value = "/{id}")
-    default ApiResponse<Integer> delete(@ApiParam(value = "id", required = true, example = "") @PathVariable(name = "id") K id,
+    public ApiResponse<Integer> delete(@ApiParam(value = "id", required = true, example = "") @PathVariable(name = "id") K id,
                                        HttpServletRequest request, HttpServletResponse response) {
         return getService().deleteByPrimaryKey(id);
     }
@@ -39,7 +39,7 @@ public interface AbstractRestController<T extends BaseModelObject<K>, K, P, L ex
      *
      * @return 抽象IAbstractService
      */
-    IAbstractService<T, K, P, L, D> getService();
+    public abstract IAbstractService<T, K, P, L, D> getService();
 
     /**
      * 通过组件获取详情
@@ -51,7 +51,7 @@ public interface AbstractRestController<T extends BaseModelObject<K>, K, P, L ex
      */
     @ApiOperation(value = "获取详情", notes = "")
     @GetMapping(value = "/{id}")
-    default ApiResponse<T> getDetails(@ApiParam(value = "id", required = true, example = "")
+    public ApiResponse<T> getDetails(@ApiParam(value = "id", required = true, example = "")
                                      @PathVariable(name = "id") K id,
                                      HttpServletRequest request, HttpServletResponse response) {
         return getService().selectByPrimaryKey(id);
@@ -69,7 +69,7 @@ public interface AbstractRestController<T extends BaseModelObject<K>, K, P, L ex
      */
     @ApiOperation(value = "新增", notes = "")
     @PostMapping(value = "")
-    default ApiResponse<T> post(@RequestBody T record,
+    public ApiResponse<T> post(@RequestBody T record,
                                HttpServletRequest request, HttpServletResponse response) {
         return getService().insertSelective(record);
     }
@@ -85,7 +85,7 @@ public interface AbstractRestController<T extends BaseModelObject<K>, K, P, L ex
      */
     @PutMapping(value = "/{id}")
     @ApiOperation(value = "更新", notes = "")
-    default ApiResponse<T> put(@RequestBody T record, @PathVariable(name = "id") K id, HttpServletRequest request, HttpServletResponse response) {
+    public ApiResponse<T> put(@RequestBody T record, @PathVariable(name = "id") K id, HttpServletRequest request, HttpServletResponse response) {
         record.assignKeyValue(id);
         return getService().updateByPrimaryKeySelective(record);
     }
@@ -99,7 +99,7 @@ public interface AbstractRestController<T extends BaseModelObject<K>, K, P, L ex
      */
     @PostMapping(value = "/validate")
     @ApiOperation(value = "唯一性校验", notes = "")
-    default ApiResponse<String> validate(@RequestBody T object, HttpServletRequest request) {
+    public ApiResponse<String> validate(@RequestBody T object, HttpServletRequest request) {
         return getService().uniqueValid(object);
     }
 }
