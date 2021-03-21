@@ -88,4 +88,10 @@ public interface IMybatisPageHelperDao<T, K> extends IAbstractDao<T, K, PageBoun
      */
     @Override
     Page<T> fuzzySearchByPager(@Param("example") T example, @Param("pageBounds") PageBounds pageBounds);
+
+    @Override
+    Integer deleteByExample(@Param("example") T example);
+
+    @Override
+    Integer updateByExampleWithBLOBs(@Param("example") T record, T example);
 }
