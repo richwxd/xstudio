@@ -1,8 +1,14 @@
 package io.github.xbeeant.http;
 
 
+import io.github.xbeeant.core.JsonHelper;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -11,10 +17,35 @@ import java.util.concurrent.Executors;
  * @author xiaobiao
  * @version 2020/3/1
  */
-public class RequestsTest {
+class RequestsTest {
+    private static final Logger logger = LoggerFactory.getLogger(RequestsTest.class);
 
     @Test
-    public void testClient() throws InterruptedException {
+    void test() throws IOException, InterruptedException {
+        // Construct BufferedReader from FileReader
+        BufferedReader br = new BufferedReader(new FileReader(new File("D:\\Documents\\Desktop\\b.csv")));
+        String line;
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Cookie", "SESSION=MTEzY2FhNDAtOTVkYi00OTVhLWEyZWEtMzgzYTc1YWIzMWY5");
+        while ((line = br.readLine()) != null) {
+            if (line.startsWith("L")) {
+                String vin = line;
+                Map<String, Object> params = new HashMap<>();
+                params.put("vin", vin);
+                ClientResponse clientResponse = Requests.postForm("https://iov.changan.com.cn/mt/admin/api/maintain/history/recalc", params, headers);
+                Maintain maintain = JsonHelper.toObject(clientResponse.getContent(), Maintain.class);
+                if (Boolean.TRUE.equals(maintain.getSuccess()) && maintain.getData().getDayLeft() > 60) {
+                    logger.info("处理 {} {}", vin, clientResponse.getContent());
+                } else {
+                    logger.debug("正常 {} {}", vin, clientResponse.getContent());
+                }
+            }
+        }
+        br.close();
+    }
+
+    @Test
+    void testClient() throws InterruptedException {
         // URL列表数组
         String[] urisToGet = {
                 "https://restapi.amap.com/v3/ip?key=0f0435e9f4b657862cc5036693c041df&ip=114.247.50.2",

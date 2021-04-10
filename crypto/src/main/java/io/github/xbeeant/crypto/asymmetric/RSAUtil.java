@@ -8,6 +8,8 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.OAEPParameterSpec;
+import javax.crypto.spec.PSource;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -16,10 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.RSAPrivateKeySpec;
-import java.security.spec.X509EncodedKeySpec;
+import java.security.spec.*;
 import java.util.Base64;
 
 /**
@@ -41,8 +40,7 @@ public class RSAUtil {
 
     public static final Charset UTF8 = StandardCharsets.UTF_8;
 
-    private static final BouncyCastleProvider BOUNCY_CASTLE_PROVIDER = new BouncyCastleProvider();
-
+    private static final Provider BOUNCY_CASTLE_PROVIDER = new BouncyCastleProvider();
 
     private RSAUtil() {
     }
@@ -80,7 +78,7 @@ public class RSAUtil {
     /**
      * 解密
      *
-     * @param privateKey  私钥
+     * @param privateKey   私钥
      * @param cryptography 密文
      * @return {@link byte[]}
      * @throws NoSuchAlgorithmException           没有这样的算法异常
@@ -90,8 +88,9 @@ public class RSAUtil {
      * @throws InvalidKeySpecException            无效的关键规范异常
      * @throws NoSuchPaddingException             没有这样的填充例外
      * @throws IOException                        IO异常
+     * @throws InvalidAlgorithmParameterException 算法参数异常
      */
-    public static byte[] decrypt(String privateKey, String cryptography) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException, InvalidKeySpecException, IOException {
+    public static byte[] decrypt(String privateKey, String cryptography) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException, InvalidKeySpecException, IOException, InvalidAlgorithmParameterException {
         Key key = toPrtoivateKey(privateKey);
         /* 得到Cipher对象对已用公钥加密的数据进行RSA解密 */
         Cipher cipher = Cipher.getInstance(RSA_ALGORITHM, BOUNCY_CASTLE_PROVIDER);
@@ -108,16 +107,18 @@ public class RSAUtil {
         RSAPrivateKeySpec keySpec = keyFactory.getKeySpec(key, RSAPrivateKeySpec.class);
         // assumes the bitLength is a multiple of 8 (check first!)
         int keySize = keySpec.getModulus().toString(2).length();
-        for (int maxDecryptBlock = keySize / 8; inputLen - offSet > 0; offSet = i * maxDecryptBlock) {
-            byte[] cache;
+        int maxDecryptBlock = keySize / 8;
+        byte[] cache;
+        // 对数据分段加密
+        while (inputLen - offSet > 0) {
             if (inputLen - offSet > maxDecryptBlock) {
                 cache = cipher.doFinal(b1, offSet, maxDecryptBlock);
             } else {
                 cache = cipher.doFinal(b1, offSet, inputLen - offSet);
             }
-
             out.write(cache, 0, cache.length);
-            ++i;
+            i++;
+            offSet = i * maxDecryptBlock;
         }
 
         byte[] b = out.toByteArray();
@@ -156,7 +157,7 @@ public class RSAUtil {
      */
     public static byte[] decrypt(PrivateKey privateKey, byte[] encrypted, int keySize) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException, IOException {
         // 解密数据，分段解密
-        Cipher dec = Cipher.getInstance(RSA_ALGORITHM);
+        Cipher dec = Cipher.getInstance(RSA_ALGORITHM, BOUNCY_CASTLE_PROVIDER);
         dec.init(Cipher.DECRYPT_MODE, privateKey);
 
         ByteArrayOutputStream ptStream = new ByteArrayOutputStream();
@@ -171,8 +172,8 @@ public class RSAUtil {
         return ptStream.toByteArray();
     }
 
-    public static byte[] encrypt(String publickKey, String message) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException, InvalidKeySpecException {
-        PublicKey key = toPublicKey(publickKey);
+    public static byte[] encrypt(String publicKey, String message) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException, InvalidKeySpecException {
+        PublicKey key = toPublicKey(publicKey);
         return encrypt(key, message);
     }
 
@@ -211,7 +212,6 @@ public class RSAUtil {
         KeyFactory keyFactory = KeyFactory.getInstance(RSA_ALGORITHM);
         return (RSAPrivateKey) keyFactory.generatePrivate(keySpec);
     }
-
 
 
     /**

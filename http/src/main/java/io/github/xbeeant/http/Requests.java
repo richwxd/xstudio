@@ -566,9 +566,20 @@ public class Requests {
     /**
      * post请求
      *
-     * @param url     地址
-     * @param jsonBody    请求的body数据
-     * @param headers 请求的headers
+     * @param url      地址
+     * @param jsonBody 请求的body数据
+     * @return ClientResponse
+     */
+    public static ClientResponse post(String url, String jsonBody) {
+        return post(url, jsonBody, new HashMap<>());
+    }
+
+    /**
+     * post请求
+     *
+     * @param url      地址
+     * @param jsonBody 请求的body数据
+     * @param headers  请求的headers
      * @return ClientResponse
      */
     public static ClientResponse post(String url, String jsonBody, Map<String, String> headers) {
@@ -577,32 +588,6 @@ public class Requests {
         addHeaders(headers, post);
         post.setEntity(new StringEntity(jsonBody, ContentType.APPLICATION_JSON));
         return res(post);
-    }
-
-    /**
-     * 设置 请求 headers
-     *
-     * @param headers 请求headers
-     * @param post    请求
-     */
-    private static void addHeaders(Map<String, String> headers, HttpRequestBase post) {
-        if (null != headers && !headers.isEmpty()) {
-            Set<Map.Entry<String, String>> headersEntryset = headers.entrySet();
-            for (Map.Entry<String, String> header : headersEntryset) {
-                post.addHeader(header.getKey(), header.getValue());
-            }
-        }
-    }
-
-    /**
-     * post请求
-     *
-     * @param url  地址
-     * @param jsonBody 请求的body数据
-     * @return ClientResponse
-     */
-    public static ClientResponse post(String url, String jsonBody) {
-        return post(url, jsonBody, new HashMap<>());
     }
 
     /**
@@ -621,6 +606,45 @@ public class Requests {
         post.setEntity(reqEntity);
 
         return res(post);
+    }
+
+    /**
+     * post请求
+     *
+     * @param url     地址
+     * @param params  参数
+     * @param headers 头部参数
+     * @return ClientResponse
+     */
+    public static ClientResponse postForm(String url, Map<String, Object> params, Map<String, String> headers) {
+        HttpPost post = new HttpPost(url);
+        //   填入各个表单域的值
+        List<NameValuePair> nvps = new ArrayList<>();
+        for (Map.Entry<String, Object> param : params.entrySet()) {
+            nvps.add(new BasicNameValuePair(param.getKey(), String.valueOf(param.getValue())));
+        }
+        addHeaders(headers, post);
+        try {
+            post.setEntity(new UrlEncodedFormEntity(nvps, "UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            logger.error("请求参数设置失败", e);
+        }
+        return res(post);
+    }
+
+    /**
+     * 设置 请求 headers
+     *
+     * @param headers 请求headers
+     * @param post    请求
+     */
+    private static void addHeaders(Map<String, String> headers, HttpRequestBase post) {
+        if (null != headers && !headers.isEmpty()) {
+            Set<Map.Entry<String, String>> headersEntryset = headers.entrySet();
+            for (Map.Entry<String, String> header : headersEntryset) {
+                post.addHeader(header.getKey(), header.getValue());
+            }
+        }
     }
 
     /**
