@@ -1,5 +1,6 @@
 package io.github.xbeeant.core.date;
 
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -10,21 +11,22 @@ import java.util.Date;
  */
 public class DateTime extends Date {
     /**
+     * 结束时间
+     */
+    private Date end;
+    /**
      * 开始时间
      */
     private Date start;
 
-    /**
-     * 结束时间
-     */
-    private Date end;
-
-    public Date getStart() {
-        return start;
+    @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj);
     }
 
-    public void setStart(Date start) {
-        this.start = start;
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 
     public Date getEnd() {
@@ -35,7 +37,36 @@ public class DateTime extends Date {
         this.end = end;
     }
 
-    public Date plus(int day) {
-        return new Date();
+    public Date getStart() {
+        return start;
+    }
+
+    public void setStart(Date start) {
+        this.start = start;
+    }
+
+    /**
+     * 减去
+     *
+     * @param amount 数量
+     * @param field  单位
+     * @return 日期
+     */
+    public Date minus(int amount, int field) {
+        return plus(-amount, field);
+    }
+
+    /**
+     * 加上
+     *
+     * @param amount 数量
+     * @param field  单位
+     * @return 日期
+     */
+    public Date plus(int amount, int field) {
+        Calendar time = Calendar.getInstance();
+        time.setTime(this);
+        time.add(field, amount);
+        return time.getTime();
     }
 }
