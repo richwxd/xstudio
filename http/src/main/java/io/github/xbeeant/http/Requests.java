@@ -3,6 +3,7 @@ package io.github.xbeeant.http;
 import io.github.xbeeant.core.ApiResponse;
 import io.github.xbeeant.core.ErrorCodeConstant;
 import io.github.xbeeant.core.JsonHelper;
+import io.github.xbeeant.http.exception.HttpResponseFailedException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
@@ -18,6 +19,7 @@ import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.config.SocketConfig;
+import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.conn.routing.HttpRoute;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.LayeredConnectionSocketFactory;
@@ -56,7 +58,13 @@ import java.util.concurrent.TimeUnit;
 @SuppressWarnings("unused")
 public class Requests {
 
+    /**
+     *
+     */
     public static final String CONTENT_TYPE = "Content-Type";
+    /**
+     * 链路追中ID
+     */
     public static final String TRACE_ID = "TRACE_ID";
     /**
      * 未知IP
@@ -91,6 +99,9 @@ public class Requests {
 
     private static final String USER_AGENT = "User-Agent";
 
+    /**
+     * 相当于线程锁,用于线程安全
+     */
     private static final Object SYNC_LOCK = new Object();
     /**
      * 日志
@@ -99,24 +110,34 @@ public class Requests {
     /**
      * 监控
      */
-    private static ScheduledExecutorService monitorExecutor;
+    private static final Map<String, ScheduledExecutorService> monitorExecutors = new HashMap<>();
     /**
      * 连接池管理类
      */
-    private static PoolingHttpClientConnectionManager connectionManager;
+    private static final Map<String, PoolingHttpClientConnectionManager> connectionManagers = new HashMap<>();
     /**
      * 发送请求的客户端单例
      */
-    private static CloseableHttpClient httpClient = null;
+    private static final Map<String, CloseableHttpClient> HTTP_CLIENTS = new HashMap<>();
 
     /**
      * 关闭连接池
      */
     public static void closeConnectionPool() {
         try {
-            httpClient.close();
-            connectionManager.close();
-            monitorExecutor.shutdown();
+            Set<Map.Entry<String, CloseableHttpClient>> clients = HTTP_CLIENTS.entrySet();
+            for (Map.Entry<String, CloseableHttpClient> client : clients) {
+                client.getValue().close();
+            }
+            Set<Map.Entry<String, PoolingHttpClientConnectionManager>> managers = connectionManagers.entrySet();
+            for (Map.Entry<String, PoolingHttpClientConnectionManager> manager : managers) {
+                manager.getValue().close();
+            }
+
+            Set<Map.Entry<String, ScheduledExecutorService>> executors = monitorExecutors.entrySet();
+            for (Map.Entry<String, ScheduledExecutorService> executor : executors) {
+                executor.getValue().shutdown();
+            }
         } catch (IOException e) {
             logger.error("", e);
         }
@@ -175,11 +196,7 @@ public class Requests {
         for (Map.Entry<String, String> param : params.entrySet()) {
             nvps.add(new BasicNameValuePair(param.getKey(), param.getValue()));
         }
-        try {
-            post.setEntity(new UrlEncodedFormEntity(nvps, "UTF-8"));
-        } catch (UnsupportedEncodingException e) {
-            logger.error("请求参数设置失败", e);
-        }
+        post.setEntity(new UrlEncodedFormEntity(nvps, StandardCharsets.UTF_8));
         return res(post);
     }
 
@@ -258,29 +275,35 @@ public class Requests {
             hostname = arr[0];
             port = Integer.parseInt(arr[1]);
         }
-        if (httpClient == null) {
+
+        String clientKey = hostname + port;
+        CloseableHttpClient client = HTTP_CLIENTS.get(clientKey);
+        if (client == null) {
             // 多线程下多个线程同时调用getHttpClient容易导致重复创建httpClient对象的问题,所以加上了同步锁
             synchronized (SYNC_LOCK) {
-                httpClient = createHttpClient(MAX_CONNECTION, MAX_PRE_ROUTE, MAX_ROUTE, hostname, port);
+                client = createHttpClient(MAX_CONNECTION, MAX_PRE_ROUTE, MAX_ROUTE, hostname, port);
                 // 开启监控线程,对异常和空闲线程进行关闭
-                monitorExecutor = new ScheduledThreadPoolExecutor(1,
+                ScheduledExecutorService executor = new ScheduledThreadPoolExecutor(1,
                         new BasicThreadFactory.Builder().namingPattern("http-monitor-schedule-pool-%d").daemon(true).build());
-                monitorExecutor.scheduleAtFixedRate(new TimerTask() {
-                                                        @Override
-                                                        public void run() {
-                                                            // 关闭异常连接
-                                                            connectionManager.closeExpiredConnections();
-                                                            // 关闭5s空闲的连接
-                                                            connectionManager.closeIdleConnections(HttpClientConfig.getHttpIdleTimeout(), TimeUnit.MILLISECONDS);
-                                                            logger.debug("close expired and idle for over {}s connection", HttpClientConfig.getHttpPerRouteSize());
-                                                        }
-                                                    }
+                PoolingHttpClientConnectionManager manager = connectionManagers.get(clientKey);
+                executor.scheduleAtFixedRate(new TimerTask() {
+                                                 @Override
+                                                 public void run() {
+                                                     // 关闭异常连接
+                                                     manager.closeExpiredConnections();
+                                                     // 关闭5s空闲的连接
+                                                     manager.closeIdleConnections(HttpClientConfig.getHttpIdleTimeout(), TimeUnit.MILLISECONDS);
+                                                     logger.debug("close expired and idle for over {}s connection", HttpClientConfig.getHttpPerRouteSize());
+                                                 }
+                                             }
                         , HttpClientConfig.getHttpMonitorInterval()
                         , HttpClientConfig.getHttpMonitorInterval()
                         , TimeUnit.MILLISECONDS);
+                HTTP_CLIENTS.put(clientKey, client);
+                monitorExecutors.put(clientKey, executor);
             }
         }
-        return httpClient;
+        return client;
     }
 
     /**
@@ -299,22 +322,24 @@ public class Requests {
         Registry<ConnectionSocketFactory> registry = RegistryBuilder
                 .<ConnectionSocketFactory>create().register("http", plainSoeketFactory)
                 .register("https", sslSocketFactory).build();
-
-        connectionManager = new PoolingHttpClientConnectionManager(registry);
+        String clientKey = hostname + port;
+        PoolingHttpClientConnectionManager manager = new PoolingHttpClientConnectionManager(registry);
         // 最大连接数
-        connectionManager.setMaxTotal(maxTotal);
+        manager.setMaxTotal(maxTotal);
         // 路由最大连接数
-        connectionManager.setDefaultMaxPerRoute(maxPerRoute);
+        manager.setDefaultMaxPerRoute(maxPerRoute);
         // 可用空闲连接过期时间,重用空闲连接时会先检查是否空闲时间超过这个时间，如果超过，释放socket重新建立
-        connectionManager.setValidateAfterInactivity(VALIDATE_TIME);
+        manager.setValidateAfterInactivity(VALIDATE_TIME);
         // 设置socket超时时间
         SocketConfig config = SocketConfig.custom().setSoTimeout(SOCKET_TIMEOUT).build();
-        connectionManager.setDefaultSocketConfig(config);
+        manager.setDefaultSocketConfig(config);
+
 
         HttpHost httpHost = new HttpHost(hostname, port);
         // 将目标主机的最大连接数增加
-        connectionManager.setMaxPerRoute(new HttpRoute(httpHost), maxRoute);
+        manager.setMaxPerRoute(new HttpRoute(httpHost), maxRoute);
 
+        connectionManagers.put(clientKey, manager);
         // 请求重试处理
         HttpRequestRetryHandler httpRequestRetryHandler = (exception, executionCount, context) -> {
             // 如果已经重试了n次，就放弃
@@ -331,18 +356,27 @@ public class Requests {
             }
             // 不要重试SSL握手异常
             if (exception instanceof SSLHandshakeException) {
+                logger.error("SSL handshake failed");
+                return false;
+            }
+            if (exception instanceof ConnectTimeoutException) {
+                // 连接超时
+                logger.error("Connection Time out");
                 return false;
             }
             // 超时
             if (exception instanceof InterruptedIOException) {
+                logger.error("interrupted IO Exception");
                 return false;
             }
             // 目标服务器不可达
             if (exception instanceof UnknownHostException) {
+                logger.error("server host unknown");
                 return false;
             }
             // SSL握手异常
             if (exception instanceof SSLException) {
+                logger.error("SSL exception");
                 return false;
             }
 
@@ -353,10 +387,8 @@ public class Requests {
             return !(request instanceof HttpEntityEnclosingRequest);
         };
 
-        logger.info("{} {} 客户池状态：{}", hostname, port, connectionManager.getTotalStats());
-
         return HttpClients.custom()
-                .setConnectionManager(connectionManager)
+                .setConnectionManager(manager)
                 .setRetryHandler(httpRequestRetryHandler).build();
     }
 
@@ -450,11 +482,11 @@ public class Requests {
         HttpEntity httpEntity = response.getEntity();
 
         // 获取结果
-        String body = "";
+        String body;
         try {
             body = EntityUtils.toString(httpEntity, StandardCharsets.UTF_8);
         } catch (IOException e) {
-            logger.error("获取请求返回返回失败", e);
+            throw new HttpResponseFailedException("获取请求返回内容失败", e);
         }
         return body;
     }
@@ -528,13 +560,7 @@ public class Requests {
      * @return Integer
      */
     public static int getServerPort(HttpServletRequest request) {
-        int port = 0;
-        try {
-            port = request.getServerPort();
-        } catch (Exception e) {
-            logger.trace("", e);
-        }
-        return port;
+        return request.getServerPort();
     }
 
     /**
@@ -544,13 +570,7 @@ public class Requests {
      * @return user Agent
      */
     public static String getUserAgent(HttpServletRequest request) {
-        String userAgent = "";
-        try {
-            userAgent = request.getHeader(USER_AGENT);
-        } catch (Exception e) {
-            logger.trace("header获取失败", e);
-        }
-        return userAgent;
+        return request.getHeader(USER_AGENT);
     }
 
     /**
@@ -618,17 +638,13 @@ public class Requests {
      */
     public static ClientResponse postForm(String url, Map<String, Object> params, Map<String, String> headers) {
         HttpPost post = new HttpPost(url);
-        //   填入各个表单域的值
+        // 填入各个表单域的值
         List<NameValuePair> nvps = new ArrayList<>();
         for (Map.Entry<String, Object> param : params.entrySet()) {
             nvps.add(new BasicNameValuePair(param.getKey(), String.valueOf(param.getValue())));
         }
         addHeaders(headers, post);
-        try {
-            post.setEntity(new UrlEncodedFormEntity(nvps, "UTF-8"));
-        } catch (UnsupportedEncodingException e) {
-            logger.error("请求参数设置失败", e);
-        }
+        post.setEntity(new UrlEncodedFormEntity(nvps, StandardCharsets.UTF_8));
         return res(post);
     }
 
@@ -664,7 +680,7 @@ public class Requests {
      * @param object   输出对象
      */
     public static void writeJson(HttpServletResponse response, Object object) {
-        write(response, object, DEFAULT_CONTENT_TYPE);
+        writeJson(response, object, DEFAULT_CONTENT_TYPE);
     }
 
     /**
@@ -674,8 +690,8 @@ public class Requests {
      * @param object      输出对象
      * @param contentType 请求类型
      */
-    public static void write(HttpServletResponse response, Object object, String contentType) {
-        response.setCharacterEncoding("UTF-8");
+    public static void writeJson(HttpServletResponse response, Object object, String contentType) {
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
         response.setContentType(contentType);
         PrintWriter out;
         try {
