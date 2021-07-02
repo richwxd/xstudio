@@ -2,11 +2,14 @@ package io.github.xbeeant.http;
 
 
 import io.github.xbeeant.core.JsonHelper;
+import org.apache.commons.lang3.time.DateFormatUtils;
+import org.apache.http.client.utils.DateUtils;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
@@ -49,7 +52,7 @@ class RequestsTest {
         // URL列表数组
         String[] urisToGet = {
                 "https://restapi.amap.com/v3/ip?key=0f0435e9f4b657862cc5036693c041df&ip=114.247.50.2",
-                "https://restapi.amap.com/v3/ip?key=0f0435e9f4b657862cc5036693c041df&ip=114.247.50.2" };
+                "https://restapi.amap.com/v3/ip?key=0f0435e9f4b657862cc5036693c041df&ip=114.247.50.2"};
 
         long start = System.currentTimeMillis();
         try {
@@ -73,6 +76,36 @@ class RequestsTest {
         long end = System.currentTimeMillis();
         System.out.println("consume -> " + (end - start));
         Thread.sleep(50000);
+    }
+
+    @Test
+    void testControl() throws InterruptedException {
+
+        String controlUrl = "http://preprod.changan.com.cn/app2/api/v2/control/execute";
+        String securityUrl = "http://preprod.changan.com.cn/app2/api/v2/security/key?token=XXeCvEX2OdtBvWjT7zyiIPjfbM2esjJM";
+        Map<String, String> params = new HashMap<>();
+        params.put("token", "XXeCvEX2OdtBvWjT7zyiIPjfbM2esjJM");
+        params.put("pin", "");
+        params.put("type", "CarForward");
+        params.put("pinVerifyCode","47270cc862734dc686b3b95b96508087");
+        params.put("carId", "1356203722980708352");
+        Date start;
+        Date end;
+        while (true) {
+            start = new Date();
+            ClientResponse clientResponse = Requests.get(securityUrl);
+            clientResponse = Requests.postForm(controlUrl, params);
+            end = new Date();
+            String startFormat = DateFormatUtils.format(start, "HH:mm:ss.SSS");
+            String endFormat = DateFormatUtils.format(end, "HH:mm:ss.SSS");
+
+            long from2 = start.getTime();
+            long to2 = end.getTime();
+            int mil = (int) (to2 - from2);
+            clientResponse.getOrigin().getHeaders("TRACE_ID");
+            logger.info("发起指令 {} 返回时间 {} 时间差 {} {}", startFormat, endFormat, mil, clientResponse.getOrigin().getHeaders("TRACE_ID")[0]);
+            Thread.currentThread().sleep(1000);
+        }
     }
 
     static class GetRunnable implements Runnable {

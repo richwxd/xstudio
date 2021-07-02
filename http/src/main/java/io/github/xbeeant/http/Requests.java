@@ -110,11 +110,11 @@ public class Requests {
     /**
      * 监控
      */
-    private static final Map<String, ScheduledExecutorService> monitorExecutors = new HashMap<>();
+    private static final Map<String, ScheduledExecutorService> MONITOR_EXECUTORS = new HashMap<>();
     /**
      * 连接池管理类
      */
-    private static final Map<String, PoolingHttpClientConnectionManager> connectionManagers = new HashMap<>();
+    private static final Map<String, PoolingHttpClientConnectionManager> CONNECTION_MANAGER = new HashMap<>();
     /**
      * 发送请求的客户端单例
      */
@@ -129,12 +129,12 @@ public class Requests {
             for (Map.Entry<String, CloseableHttpClient> client : clients) {
                 client.getValue().close();
             }
-            Set<Map.Entry<String, PoolingHttpClientConnectionManager>> managers = connectionManagers.entrySet();
+            Set<Map.Entry<String, PoolingHttpClientConnectionManager>> managers = CONNECTION_MANAGER.entrySet();
             for (Map.Entry<String, PoolingHttpClientConnectionManager> manager : managers) {
                 manager.getValue().close();
             }
 
-            Set<Map.Entry<String, ScheduledExecutorService>> executors = monitorExecutors.entrySet();
+            Set<Map.Entry<String, ScheduledExecutorService>> executors = MONITOR_EXECUTORS.entrySet();
             for (Map.Entry<String, ScheduledExecutorService> executor : executors) {
                 executor.getValue().shutdown();
             }
@@ -285,7 +285,7 @@ public class Requests {
                 // 开启监控线程,对异常和空闲线程进行关闭
                 ScheduledExecutorService executor = new ScheduledThreadPoolExecutor(1,
                         new BasicThreadFactory.Builder().namingPattern("http-monitor-schedule-pool-%d").daemon(true).build());
-                PoolingHttpClientConnectionManager manager = connectionManagers.get(clientKey);
+                PoolingHttpClientConnectionManager manager = CONNECTION_MANAGER.get(clientKey);
                 executor.scheduleAtFixedRate(new TimerTask() {
                                                  @Override
                                                  public void run() {
@@ -299,8 +299,9 @@ public class Requests {
                         , HttpClientConfig.getHttpMonitorInterval()
                         , HttpClientConfig.getHttpMonitorInterval()
                         , TimeUnit.MILLISECONDS);
+
                 HTTP_CLIENTS.put(clientKey, client);
-                monitorExecutors.put(clientKey, executor);
+                MONITOR_EXECUTORS.put(clientKey, executor);
             }
         }
         return client;
@@ -339,7 +340,7 @@ public class Requests {
         // 将目标主机的最大连接数增加
         manager.setMaxPerRoute(new HttpRoute(httpHost), maxRoute);
 
-        connectionManagers.put(clientKey, manager);
+        CONNECTION_MANAGER.put(clientKey, manager);
         // 请求重试处理
         HttpRequestRetryHandler httpRequestRetryHandler = (exception, executionCount, context) -> {
             // 如果已经重试了n次，就放弃
