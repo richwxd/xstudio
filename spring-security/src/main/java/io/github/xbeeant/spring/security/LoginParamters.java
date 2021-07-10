@@ -16,6 +16,7 @@ import java.util.Set;
 
 /**
  * 登录参数
+ *
  * @author xiaobiao
  * @version 1.0.0
  * @date 2020/12/12
@@ -23,33 +24,28 @@ import java.util.Set;
 public class LoginParamters implements Serializable {
 
     /**
-     * ip
-     */
-    private String ip;
-
-    /**
-     * userAgent
-     */
-    private String userAgent;
-
-    /**
-     * 请求参数头
-     */
-    private Map<String, String> headers;
-
-    /**
      * 其他参数
      */
     @SuppressWarnings("all")
     private Map<String, Object> extras;
-
+    /**
+     * 请求参数头
+     */
+    private Map<String, String> headers;
+    /**
+     * ip
+     */
+    private String ip;
+    private boolean remember = false;
     /**
      * session
      */
     @SuppressWarnings("all")
     private Map<String, Object> sessions;
-
-    private boolean remember = false;
+    /**
+     * userAgent
+     */
+    private String userAgent;
 
     public LoginParamters(HttpServletRequest request) {
         String body;
@@ -63,8 +59,9 @@ public class LoginParamters implements Serializable {
         this.ip = Requests.getIp(request);
         this.userAgent = Requests.getUserAgent(request);
         // get parameters from body
-        if (!StringUtils.isEmpty(body)) {
-            Type type = new TypeToken<Map<String, Object>>() {}.getType();
+        if (!StringUtils.isEmpty(body) && (body.startsWith("{") || body.startsWith("["))) {
+            Type type = new TypeToken<Map<String, Object>>() {
+            }.getType();
             Map<String, Object> parse = new Gson().fromJson(body, type);
             if (null != parse) {
                 Set<Map.Entry<String, Object>> entries = parse.entrySet();
@@ -92,21 +89,6 @@ public class LoginParamters implements Serializable {
             String s = sessionsNames.nextElement();
             addSession(s, request.getSession().getAttribute(s));
         }
-    }
-
-
-    /**
-     * 获取属性
-     *
-     * @param key 属性键
-     * @return 属性值
-     */
-    public Object get(String key) {
-        if (null == this.extras) {
-            return null;
-        }
-
-        return this.extras.get(key);
     }
 
     /**
@@ -143,58 +125,26 @@ public class LoginParamters implements Serializable {
     }
 
     /**
+     * 获取属性
+     *
+     * @param key 属性键
+     * @return 属性值
+     */
+    public Object get(String key) {
+        if (null == this.extras) {
+            return null;
+        }
+
+        return this.extras.get(key);
+    }
+
+    /**
      * get field 其他参数
      *
      * @return extras 其他参数
      */
     public Map<String, Object> getExtras() {
         return this.extras;
-    }
-
-    /**
-     * get field 请求参数头
-     *
-     * @return headers 请求参数头
-     */
-    public Map<String, String> getHeaders() {
-        return this.headers;
-    }
-
-
-    /**
-     * get field ip
-     *
-     * @return ip ip
-     */
-    public String getIp() {
-        return this.ip;
-    }
-
-    /**
-     * get field session
-     *
-     * @return sessions session
-     */
-    public Map<String, Object> getSessions() {
-        return this.sessions;
-    }
-
-    /**
-     * get field userAgent
-     *
-     * @return userAgent userAgent
-     */
-    public String getUserAgent() {
-        return this.userAgent;
-    }
-
-    /**
-     * get field
-     *
-     * @return remember
-     */
-    public boolean isRemember() {
-        return this.remember;
     }
 
     /**
@@ -207,12 +157,30 @@ public class LoginParamters implements Serializable {
     }
 
     /**
+     * get field 请求参数头
+     *
+     * @return headers 请求参数头
+     */
+    public Map<String, String> getHeaders() {
+        return this.headers;
+    }
+
+    /**
      * set field 请求参数头
      *
      * @param headers 请求参数头
      */
     public void setHeaders(Map<String, String> headers) {
         this.headers = headers;
+    }
+
+    /**
+     * get field ip
+     *
+     * @return ip ip
+     */
+    public String getIp() {
+        return this.ip;
     }
 
     /**
@@ -225,12 +193,12 @@ public class LoginParamters implements Serializable {
     }
 
     /**
-     * set field
+     * get field session
      *
-     * @param remember 记住登录
+     * @return sessions session
      */
-    public void setRemember(boolean remember) {
-        this.remember = remember;
+    public Map<String, Object> getSessions() {
+        return this.sessions;
     }
 
     /**
@@ -243,11 +211,38 @@ public class LoginParamters implements Serializable {
     }
 
     /**
+     * get field userAgent
+     *
+     * @return userAgent userAgent
+     */
+    public String getUserAgent() {
+        return this.userAgent;
+    }
+
+    /**
      * set field userAgent
      *
      * @param userAgent userAgent user-agent
      */
     public void setUserAgent(String userAgent) {
         this.userAgent = userAgent;
+    }
+
+    /**
+     * get field
+     *
+     * @return remember
+     */
+    public boolean isRemember() {
+        return this.remember;
+    }
+
+    /**
+     * set field
+     *
+     * @param remember 记住登录
+     */
+    public void setRemember(boolean remember) {
+        this.remember = remember;
     }
 }
