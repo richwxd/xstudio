@@ -5,5 +5,5 @@ dependencies {
     compile('org.mybatis.spring.boot:mybatis-spring-boot-starter:2.0.1')
     compile("org.mybatis:mybatis:3.5.1")
 
-    runtimeOnly(project(":core"))
+    compileOnly(project(":core"))
 }

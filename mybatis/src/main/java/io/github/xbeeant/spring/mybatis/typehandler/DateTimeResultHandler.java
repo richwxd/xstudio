@@ -4,10 +4,7 @@ import io.github.xbeeant.core.date.DateTime;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
 
-import java.sql.CallableStatement;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.Date;
 
 
@@ -18,11 +15,12 @@ import java.util.Date;
 public class DateTimeResultHandler implements TypeHandler<DateTime> {
     @Override
     public void setParameter(PreparedStatement ps, int i, DateTime parameter, JdbcType jdbcType) throws SQLException {
+        ps.setTimestamp(i, new Timestamp(parameter.getTime()));
     }
 
     @Override
     public DateTime getResult(ResultSet rs, String columnName) throws SQLException {
-        Date date = rs.getDate(columnName);
+        Date date = rs.getTimestamp(columnName);
         if (null == date) {
             return null;
         }
@@ -33,7 +31,7 @@ public class DateTimeResultHandler implements TypeHandler<DateTime> {
 
     @Override
     public DateTime getResult(ResultSet rs, int columnIndex) throws SQLException {
-        Date date = rs.getDate(columnIndex);
+        Date date = rs.getTimestamp(columnIndex);
         if (null == date) {
             return null;
         }
@@ -44,7 +42,7 @@ public class DateTimeResultHandler implements TypeHandler<DateTime> {
 
     @Override
     public DateTime getResult(CallableStatement cs, int columnIndex) throws SQLException {
-        Date date = cs.getDate(columnIndex);
+        Date date = cs.getTimestamp(columnIndex);
         if (null == date) {
             return null;
         }

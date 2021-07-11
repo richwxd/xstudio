@@ -63,7 +63,7 @@ public class LoginParamters implements Serializable {
         this.ip = Requests.getIp(request);
         this.userAgent = Requests.getUserAgent(request);
         // get parameters from body
-        if (!StringUtils.isEmpty(body)) {
+        if (!StringUtils.isEmpty(body) && (body.startsWith("{") || body.startsWith("["))) {
             Type type = new TypeToken<Map<String, Object>>() {}.getType();
             Map<String, Object> parse = new Gson().fromJson(body, type);
             if (null != parse) {
