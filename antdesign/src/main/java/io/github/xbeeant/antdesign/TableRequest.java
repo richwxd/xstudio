@@ -25,6 +25,10 @@ public class TableRequest implements Serializable {
      */
     private String sorter = "";
 
+    public void setCurrent(Integer current) {
+        this.currentPage = current;
+    }
+
     public Integer getCurrentPage() {
         return currentPage;
     }

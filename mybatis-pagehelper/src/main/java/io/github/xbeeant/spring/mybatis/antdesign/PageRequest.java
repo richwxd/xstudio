@@ -22,7 +22,10 @@ public class PageRequest extends TableRequest {
     }
 
     public PageBounds getPageBounds() {
-        PageBounds pageBounds = new PageBounds(getCurrentPage(), getPageSize());
+        Integer currentPage = getCurrentPage();
+        Integer pageSize = getPageSize();
+        PageBounds pageBounds = new PageBounds((currentPage - 1 ) * pageSize, pageSize);
+        pageBounds.setPage(currentPage);
         pageBounds.setOrders(getOrder());
         return pageBounds;
     }
